@@ -1,3 +1,18 @@
 spring:
   application:
     name : aloa
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/aloa?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: root
+    password: 1234
+
+  jpa :
+    database : mysql
+    hibernate :
+      ddl-auto : update
+    show-sql : true
+    open-in-view : false
+    properties :
+      hibernate :
+        format_sql : true
