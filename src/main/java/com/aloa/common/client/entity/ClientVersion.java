@@ -21,5 +21,5 @@ public class ClientVersion {
     @Column(nullable = false)
     private LocalDate updateDate;
     @Column(nullable = false)
-    private boolean isOfficialBalancePatch;
+    private boolean officialBalancePatch;
 }

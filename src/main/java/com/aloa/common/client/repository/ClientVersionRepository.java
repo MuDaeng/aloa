@@ -4,8 +4,10 @@ import com.aloa.common.client.entity.ClientVersion;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClientVersionRepository extends JpaRepository<ClientVersion, Long> {
-    List<ClientVersion> findByVersion(String version);
-    List<ClientVersion> findByIsOfficialBalancePatch(boolean isOfficialBalancePatch);
+    Optional<ClientVersion> findByVersion(String version);
+    List<ClientVersion> findByOfficialBalancePatchIsTrue();
+    List<ClientVersion> findByVersionIn(List<String> versionList);
 }

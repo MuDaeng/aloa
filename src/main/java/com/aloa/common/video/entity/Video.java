@@ -1,17 +1,19 @@
 package com.aloa.common.video.entity;
 
+import com.aloa.common.card.entity.Engrave;
 import com.aloa.common.user.entitiy.LostArkCharacter;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
     private Long id;
     @Column(nullable = false)
     private String title;
@@ -34,9 +36,32 @@ public class Video {
 
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
-    private CalculationStateCode calculationStateCode;
+    private CalculationState calculationState;
 
-    public void mapCharacter(@NonNull LostArkCharacter lostArkCharacter) {
+    @Builder
+    public Video(String description, String path, String chosung, String title, Long id, String clientVersion) {
+        this.description = description;
+        this.path = path;
+        this.chosung = chosung;
+        this.title = title;
+        this.id = id;
+        this.clientVersion = clientVersion;
+    }
 
+    public void mapCharacter(@NonNull @Valid LostArkCharacter lostArkCharacter) {
+        this.expeditionId = lostArkCharacter.getExpeditionId();
+        this.characterSequence = lostArkCharacter.getSequence();
+    }
+
+    public void setCalculationState(@NonNull @Valid CalculationState calculationState) {
+        this.calculationState = calculationState;
+    }
+
+    public void setClientVersion(@NonNull @Valid String clientVersion) {
+        this.clientVersion = clientVersion;
+    }
+
+    public void setEngrave(@NonNull @Valid Engrave engrave) {
+        this.engrave = engrave;
     }
 }

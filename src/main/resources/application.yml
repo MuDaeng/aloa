@@ -16,3 +16,8 @@ spring:
     properties :
       hibernate :
         format_sql : true
+  youtube :
+    api :
+      key : AIzaSyAgrQQ13zrtd0PFE5JXiKnRrDrsiOpjRzU
+  profiles:
+    include: oauth
