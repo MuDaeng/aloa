@@ -1,28 +1,31 @@
-package com.aloa.online.video.validator;
+package com.aloa.common.video.validator;
 
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
-import com.aloa.common.video.manager.GoogleApiManager;
 import com.aloa.common.video.repository.VideoRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.util.*;
+
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Component
 @RequiredArgsConstructor
 public class VideoValidator {
     private final VideoRepository videoRepository;
-    private final GoogleApiManager googleApiManager;
 
     public boolean isDuplicated(String path) {
+
         //유튜브경로로 이미 유튜브가 등록되어있는지 검색
-        var video = videoRepository.findByPath(path);
+        var videoByPath = videoRepository.findByPath(path);
 
-        if(video.isPresent()) throw new IllegalArgumentException(video.get().getCalculationState().getMessage());
+        if(videoByPath.isPresent()) return true;
+        var youtubeVideoId = extractVideoId(path);
 
-        googleApiManager.getYoutubeInfo(path);
-        return false;
+        var videoByYoutubeVideoId = videoRepository.findByYoutubeVideoId(youtubeVideoId);
+
+        return videoByYoutubeVideoId.isPresent();
     }
 
     public CalculationState getCalculationState(Optional<Video> video) {
@@ -30,6 +33,15 @@ public class VideoValidator {
                 .orElseThrow(
                         () -> new IllegalArgumentException("등록된 비디오가 없습니다."))
                 ;
+    }
+
+    public String extractVideoId(String path){
+        String[] split = path.split("\\?");
+
+        return Stream.of(split)
+                .filter(str -> str.contains("v="))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 URL을 입력했습니다."));
     }
 
     public Optional<Video> findByPath(@NonNull String path) {

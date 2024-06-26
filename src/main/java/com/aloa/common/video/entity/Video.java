@@ -23,6 +23,9 @@ public class Video {
     @Column(nullable = false, length = 500)
     private String path;
 
+    @Column(nullable = false)
+    private String youtubeVideoId;
+
     @Column(length = 1500)
     private String description;
 
@@ -39,9 +42,10 @@ public class Video {
     private CalculationState calculationState;
 
     @Builder
-    public Video(String description, String path, String chosung, String title, Long id, String clientVersion) {
+    public Video(String description, String path, String youtubeVideoId, String chosung, String title, Long id, String clientVersion) {
         this.description = description;
         this.path = path;
+        this.youtubeVideoId = youtubeVideoId;
         this.chosung = chosung;
         this.title = title;
         this.id = id;

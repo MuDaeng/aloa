@@ -30,6 +30,9 @@ public class VideoHist {
     @Column(nullable = false, length = 500)
     private String path;
 
+    @Column(nullable = false)
+    private String youtubeVideoId;
+
     @Column(length = 1500)
     private String description;
 
@@ -52,6 +55,7 @@ public class VideoHist {
         this.title = video.getTitle();
         this.chosung = video.getChosung();
         this.path = video.getPath();
+        this.youtubeVideoId = video.getYoutubeVideoId();
         this.description = video.getDescription();
         this.expeditionId = video.getExpeditionId();
         this.characterSequence = video.getCharacterSequence();

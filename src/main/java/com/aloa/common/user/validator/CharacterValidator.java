@@ -1,4 +1,4 @@
-package com.aloa.online.video.validator;
+package com.aloa.common.user.validator;
 
 import com.aloa.common.user.entitiy.LostArkCharacter;
 import com.aloa.common.user.repository.LostArkCharacterRepository;

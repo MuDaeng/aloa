@@ -1,16 +1,16 @@
 package com.aloa.online.video.service;
 
 import com.aloa.common.card.entity.Engrave;
-import com.aloa.common.user.entitiy.primarykey.LostArkCharacterPK;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.manager.GoogleApiManager;
 import com.aloa.common.video.manager.VideoSaveManager;
 import com.aloa.online.video.calculator.VideoCalculator;
+import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import com.aloa.online.video.dto.VideoRegisterDTO;
 import com.aloa.online.video.mapper.CharacterValidatorMapper;
-import com.aloa.online.video.validator.CharacterValidator;
-import com.aloa.online.video.validator.VideoValidator;
+import com.aloa.common.user.validator.CharacterValidator;
+import com.aloa.common.video.validator.VideoValidator;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,9 @@ public class VideoSaveService {
         final String engrave = videoRegisterDTO.getEngrave();
 
         //비디오가 이미 등록되어 있으면 비디오의 계산상태코드로 메시지 리턴
-        videoValidator.isDuplicated(path);
+        if(videoValidator.isDuplicated(path)){
+            throw new IllegalArgumentException("Duplicated path");
+        }
 
         //
         var youtubeVideo = googleApiManager.getYoutubeInfo(path);
@@ -53,8 +55,6 @@ public class VideoSaveService {
         engraveMap.put("EMPEROR", Engrave.EMPEROR);
         youtubeVideo.setEngrave(engraveMap.get(engrave));
 
-        youtubeVideo.setClientVersion("");
-
         youtubeVideo.setCalculationState(CalculationState.WAITING);
 
         videoSaveManager.regVideo(youtubeVideo);
@@ -63,8 +63,8 @@ public class VideoSaveService {
     }
 
 
-    public void mapCharacter(@NonNull Video video, @NonNull @Valid LostArkCharacterPK lostArkCharacterPK){
-        var character = CharacterValidatorMapper.INSTANCE.toLostArkCharacter(lostArkCharacterPK);
+    public void mapCharacter(@NonNull Video video, @NonNull @Valid LostArkCharacterIdDTO lostArkCharacterIdDTO){
+        var character = CharacterValidatorMapper.INSTANCE.toLostArkCharacter(lostArkCharacterIdDTO);
         character = characterValidator.findCharacter(character);
 
         if(character == null || !character.isArcana()){

@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface VideoRepository extends JpaRepository<Video, Long> {
     Optional<Video> findByPath(String path);
 
+    Optional<Video> findByYoutubeVideoId(String youtubeVideoId);
+
     List<Video> findByChosungStartsWith(String chosung);
 
     List<Video> findByTitleStartsWith(String title);
