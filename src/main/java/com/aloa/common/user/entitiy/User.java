@@ -1,9 +1,7 @@
 package com.aloa.common.user.entitiy;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import com.aloa.common.user.entitiy.primarykey.UserRole;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,13 +17,17 @@ import java.util.List;
 public class User {
     /** 사용자 pk */
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    /** 구글인증토큰 */
-    @Column(unique=true, nullable = false, updatable = false)
-    private String googleAuthToken;
+    @Enumerated(EnumType.ORDINAL)
+    @Column(nullable = false)
+    private UserRole role;
+
+    @Column(nullable = false)
+    private String name;
     /** 구글사용자 이메일 */
     @Column(unique=true, nullable = false, updatable = false)
-    private Long googleUserId;
+    private String googleUserId;
 
     @OneToMany(mappedBy = "userId")
     private List<Expedition> expeditionList;
