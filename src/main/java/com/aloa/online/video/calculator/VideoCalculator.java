@@ -21,12 +21,14 @@ public class VideoCalculator {
 
     public void calculate(@NonNull Video video) {
         //
-        videoSaveManager.startVideoCalculation(video);
+
+        videoSaveManager.notifyDownloading(video);
 
         /** 구글에서 유튜브 정보 가져옴 */
 
         /** */
 
+        videoSaveManager.notifyCalculating(video);
         //for문으로 계산
         //독립시행 종속시행 포함
         Map<Card, VideoCalculationResult> cardCalculationMap = initCalculation(video, false);

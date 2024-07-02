@@ -1,6 +1,5 @@
 package com.aloa.configuration.oauth;
 
-import com.aloa.common.user.entitiy.User;
 import com.aloa.common.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -35,15 +34,15 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .build();
 
         // 5. 회원가입 및 로그인
-        User user = getOrSave(oAuth2UserInfo);
+        getOrSave(oAuth2UserInfo);
 
         // 6. OAuth2User로 반환
-        return new PrincipalDetails(user, oAuth2UserAttributes, userNameAttributeName);
+        return new PrincipalDetails(oAuth2UserInfo, oAuth2UserAttributes, userNameAttributeName);
     }
 
-    private User getOrSave(OAuth2UserInfo oAuth2UserInfo) {
+    private void getOrSave(OAuth2UserInfo oAuth2UserInfo) {
         var user = userRepository.findByGoogleUserId(oAuth2UserInfo.email())
                 .orElseGet(oAuth2UserInfo::toUser);
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 }

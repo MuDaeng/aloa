@@ -4,7 +4,6 @@ import com.aloa.common.card.entity.Engrave;
 import com.aloa.common.video.entity.primarykey.VideoHistPK;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -17,10 +16,8 @@ import java.time.LocalDateTime;
 @Entity
 public class VideoHist {
     @Id
-    @NotNull
     private Long id;
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer histSequence;
     @Column(nullable = false)
     private String title;
@@ -50,8 +47,9 @@ public class VideoHist {
 
     private LocalDateTime regTime;
 
-    public VideoHist(@NonNull @Valid Video video){
+    public VideoHist(@NonNull @Valid Video video, Integer histSequence){
         this.id = video.getId();
+        this.histSequence = histSequence;
         this.title = video.getTitle();
         this.chosung = video.getChosung();
         this.path = video.getPath();

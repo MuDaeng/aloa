@@ -12,7 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.*;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,7 +32,8 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico", "/swagger-ui/**");
+                .requestMatchers("/error", "/favicon.ico",
+                        "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**");
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -49,10 +50,17 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest
                         .requestMatchers("/video/reg", "/video/character").hasRole(UserRole.USER.getCode())
+                        .requestMatchers("/youtube/v1/youtube", "youtube/v1/reg-video").hasRole(UserRole.USER.getCode())
+                        .requestMatchers("/", "/oauth/token", "/api-docs/swagger-config", "/api-docs").permitAll()
                         .anyRequest().authenticated()
                 )
                 // 로그아웃 성공 시 / 주소로 이동
-                .logout(logoutConfig -> logoutConfig.logoutSuccessUrl("/"))
+                .logout(
+                        logoutConfig -> logoutConfig
+//                                .logoutRequestMatcher(new AntPathRequestMatcher("/user/logout", "GET"))
+                                .logoutSuccessUrl("/")
+//                                .invalidateHttpSession(true)
+                )
                 // OAuth2 로그인 기능에 대한 여러 설정
                 .oauth2Login(oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
                         // OAuth2 로그인 성공 이후 사용자 정보를 가져올 때의 설정을 담당
@@ -65,5 +73,6 @@ public class SecurityConfig {
         return http.addFilterBefore(jwtAuthFilter, OAuth2LoginAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
                 .build();
+//        return http.build();
     }
 }

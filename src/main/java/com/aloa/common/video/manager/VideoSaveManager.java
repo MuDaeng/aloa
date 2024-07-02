@@ -28,14 +28,22 @@ public class VideoSaveManager {
         return result;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void notifyDownloading(@NonNull Video video) {
+        video.setCalculationState(CalculationState.DOWNLOADING);
+    }
+
     //비디오 계산용
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void startVideoCalculation(@NonNull Video video){
+    public void notifyCalculating(@NonNull Video video){
         video.setCalculationState(CalculationState.CALCULATING);
     }
 
     public void saveVideoHist(@NonNull Video video) {
-        videoHistRepository.save(new VideoHist(video));
+        int nextSeq = videoHistRepository.findFirstByPathOrderByHistSequenceDesc(video.getPath())
+                .map(VideoHist::getHistSequence)
+                .orElse(0) + 1;
+        videoHistRepository.save(new VideoHist(video, nextSeq));
     }
 
     public List<VideoCalculationResult> regCalculationResult(@NonNull List<VideoCalculationResult> videoCalculationResultList) {

@@ -1,6 +1,5 @@
 package com.aloa.configuration.oauth;
 
-import com.aloa.common.user.entitiy.User;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public record PrincipalDetails(User user, Map<String, Object> attributes, String attributeKey) implements OAuth2User, UserDetails {
+public record PrincipalDetails(OAuth2UserInfo oAuth2UserInfo, Map<String, Object> attributes, String attributeKey) implements OAuth2User, UserDetails {
 
 
     @Override
@@ -21,7 +20,7 @@ public record PrincipalDetails(User user, Map<String, Object> attributes, String
 
     @Override
     public String getUsername() {
-        return user.getGoogleUserId();
+        return oAuth2UserInfo.email();
     }
 
     @Override
@@ -31,11 +30,11 @@ public record PrincipalDetails(User user, Map<String, Object> attributes, String
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(UserRole.USER.getCode()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + UserRole.USER.getCode()));
     }
 
     @Override
     public String getName() {
-        return user.getGoogleUserId();
+        return oAuth2UserInfo.name();
     }
 }

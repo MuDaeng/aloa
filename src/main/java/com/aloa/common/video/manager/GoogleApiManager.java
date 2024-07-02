@@ -1,5 +1,6 @@
 package com.aloa.common.video.manager;
 
+import com.aloa.common.client.entity.ClientVersion;
 import com.aloa.common.client.manager.ClientVersionManager;
 import com.aloa.common.util.ChosungExtractor;
 import com.aloa.common.video.entity.Video;
@@ -19,7 +20,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class GoogleApiManager {
-    /** api키 */
+    /** apiKey */
     @Value("${youtube.api.key}")
     private String apiKey;
 
@@ -42,15 +43,20 @@ public class GoogleApiManager {
                 .path(path)
                 .youtubeVideoId(youtubeVideoId)
                 .chosung(ChosungExtractor.extractChosung(snippet.getTitle()))
-                .clientVersion(clientVersionManager.getClientVersion(snippet.getPublishedAt()).getVersion())
+                .clientVersion(
+                        Optional.ofNullable(
+                                clientVersionManager.getClientVersion(snippet.getPublishedAt())
+                                )
+                                .map(ClientVersion::getVersion)
+                                .orElse(null))
                 .build();
     }
 
     public VideoSnippet getYoutubeSnippet(@NonNull String videoId){
-        Optional<VideoListResponse> response = Optional.empty();
+        Optional<VideoListResponse> response;
 
         try {
-            response = Optional.of(
+            response = Optional.ofNullable(
                     youtube.videos()
                             .list(List.of("id", "snippet", "contentDetails"))
                             .setKey(apiKey)

@@ -4,8 +4,10 @@ import com.aloa.common.card.entity.Engrave;
 import com.aloa.common.user.entitiy.LostArkCharacter;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Getter
 @NoArgsConstructor
@@ -13,7 +15,6 @@ import lombok.*;
 public class Video {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotNull
     private Long id;
     @Column(nullable = false)
     private String title;

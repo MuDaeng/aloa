@@ -1,16 +1,18 @@
 package com.aloa.online.video.service;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.user.validator.CharacterValidator;
+import com.aloa.common.util.SignedInUser;
+import com.aloa.common.util.SignedInUserUtil;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.manager.GoogleApiManager;
 import com.aloa.common.video.manager.VideoSaveManager;
+import com.aloa.common.video.validator.VideoValidator;
 import com.aloa.online.video.calculator.VideoCalculator;
 import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import com.aloa.online.video.dto.VideoRegisterDTO;
 import com.aloa.online.video.mapper.CharacterValidatorMapper;
-import com.aloa.common.user.validator.CharacterValidator;
-import com.aloa.common.video.validator.VideoValidator;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,10 @@ public class VideoSaveService {
         var youtubeVideo = googleApiManager.getYoutubeInfo(path);
 
         if(youtubeVideo == null) throw new IllegalArgumentException("잘못된 경로입니다.");
+
+        SignedInUser signedInUser = SignedInUserUtil.getSignedInUser();
+
+        if(!signedInUser.isVideoOfUser(youtubeVideo)) throw new IllegalArgumentException("다른사람의 영상입니다.");
 
         if(!(videoRegisterDTO.getCharacterId() == null)) mapCharacter(youtubeVideo, videoRegisterDTO.getCharacterId());
 

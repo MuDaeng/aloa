@@ -23,11 +23,11 @@ public class AuthTokenProvider {
     private final JwtProperties jwtProperties;
 
     public String generateAccessToken(Authentication authentication) {
-        return generateToken(authentication, jwtProperties.getAccessTokenExpirationMinutes());
+        return generateToken(authentication, jwtProperties.getAccessExpirationMinutes());
     }
 
-    public void generateRefreshToken(Authentication authentication) {
-        String refreshToken = generateToken(authentication, jwtProperties.getRefreshExpirationMinutes());
+    public String generateRefreshToken(Authentication authentication) {
+        return generateToken(authentication, jwtProperties.getRefreshExpirationMinutes());
     }
 
     private String generateToken(Authentication authentication, long expireTime) {

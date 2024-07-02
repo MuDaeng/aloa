@@ -3,7 +3,6 @@ package com.aloa.common.video.validator;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.repository.VideoRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -41,10 +40,7 @@ public class VideoValidator {
         return Stream.of(split)
                 .filter(str -> str.contains("v="))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("잘못된 URL을 입력했습니다."));
-    }
-
-    public Optional<Video> findByPath(@NonNull String path) {
-        return videoRepository.findByPath(path);
+                .orElseThrow(() -> new IllegalArgumentException("잘못된 URL을 입력했습니다."))
+                .replace("v=", "");
     }
 }

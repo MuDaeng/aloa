@@ -22,3 +22,28 @@ spring:
 youtube :
   api :
     key : AIzaSyAgrQQ13zrtd0PFE5JXiKnRrDrsiOpjRzU
+
+jwt :
+  secret-key: 810dbe9a151bc9fe4631e8e4a736f2fb49d8e43c1489e07e046ec1c15e1dff91e88c81abf497d17ce2f367f8c2d766abb6cdcd5f7bd9dd25cd0d6717dca04053
+  refresh-expiration-minutes : 4320
+  access-expiration-minutes: 30
+  issuer: mudaeng
+
+springdoc:
+  swagger-ui:
+    groups-order: DESC
+    tags-sorter: alpha
+    operations-sorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
+    defaultModelsExpandDepth: 2
+    defaultModelExpandDepth: 2
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  writer-with-default-pretty-printer: true
+  model-and-view-allowed: true
+  paths-to-match:
+    - /**
