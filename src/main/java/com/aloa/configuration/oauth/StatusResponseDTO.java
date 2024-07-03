@@ -18,6 +18,10 @@ public class StatusResponseDTO {
         return StatusResponseDTO.builder().status(status).build();
     }
 
+    public static StatusResponseDTO addStatus(Integer status, Object data) {
+        return StatusResponseDTO.builder().status(status).Data(data).build();
+    }
+
     public static StatusResponseDTO success() {
         return StatusResponseDTO.builder().status(200).build();
     }
