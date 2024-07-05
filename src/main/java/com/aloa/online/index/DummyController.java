@@ -1,14 +1,12 @@
 package com.aloa.online.index;
 
+import com.aloa.common.StatusResponseDTO;
+import com.aloa.common.token.JwtProperties;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
 import com.aloa.common.user.repository.UserRepository;
-import com.aloa.configuration.oauth.StatusResponseDTO;
-import com.aloa.configuration.oauth.provider.AuthTokenProvider;
-import com.aloa.configuration.oauth.provider.JwtProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +26,6 @@ import java.util.List;
 @RequestMapping
 @RequiredArgsConstructor
 public class DummyController {
-    private final AuthTokenProvider authTokenProvider;
     private final UserRepository userRepository;
     private final JwtProperties jwtProperties;
 
@@ -43,10 +40,11 @@ public class DummyController {
                     .setIssuer(jwtProperties.getIssuer())  // JWT 토큰 발급자
                     .setExpiration(Date.from(Instant.now().plus(jwtProperties.getAccessExpirationMinutes(), ChronoUnit.MINUTES)))    // JWT 토큰 만료 시간
                     .claim("role", List.of(new SimpleGrantedAuthority("ROLE_" + UserRole.USER.getCode())))
+                    .claim("name", user.get().getName())
                     .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))// JWT 토큰 발급 시간
                     .compact());
         }
-        return StatusResponseDTO.addStatus(403);
+        return StatusResponseDTO.addStatus(200);
     }
 
     @GetMapping("/")

@@ -15,6 +15,7 @@ public class Token {
     @Id
     private String refreshToken;
 
+    @Setter
     @Column(nullable = false)
     private String accessToken;
 }

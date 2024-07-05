@@ -1,6 +1,8 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common.security;
 
+import com.aloa.common.security.oauth.OAuth2UserInfo;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public record PrincipalDetails(OAuth2UserInfo oAuth2UserInfo, Map<String, Object> attributes, String attributeKey) implements OAuth2User, UserDetails {
+public record PrincipalDetails(@Getter OAuth2UserInfo oAuth2UserInfo, Map<String, Object> attributes, String attributeKey) implements OAuth2User, UserDetails {
 
 
     @Override

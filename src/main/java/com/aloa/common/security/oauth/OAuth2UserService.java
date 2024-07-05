@@ -1,5 +1,6 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common.security.oauth;
 
+import com.aloa.common.security.PrincipalDetails;
 import com.aloa.common.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

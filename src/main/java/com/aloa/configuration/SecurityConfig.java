@@ -1,7 +1,9 @@
 package com.aloa.configuration;
 
+import com.aloa.common.security.oauth.*;
+import com.aloa.common.security.oauth.jwt.JwtAuthFilter;
+import com.aloa.common.security.oauth.jwt.JwtExceptionFilter;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
-import com.aloa.configuration.oauth.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

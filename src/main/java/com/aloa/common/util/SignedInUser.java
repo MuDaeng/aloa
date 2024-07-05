@@ -1,27 +1,27 @@
 package com.aloa.common.util;
 
 import com.aloa.common.video.entity.Video;
-import com.aloa.configuration.oauth.OAuth2UserInfo;
+import com.aloa.common.security.oauth.OAuth2UserInfo;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
 
 import java.util.Optional;
 
-@Builder(access = AccessLevel.NONE)
+@Builder(access = AccessLevel.PACKAGE)
 public class SignedInUser {
-    private Optional<OAuth2UserInfo> loginUser;
+    private Optional<OAuth2UserInfo> user;
 
     public boolean isSignedIn(){
-        return loginUser.isPresent();
+        return user.isPresent();
     }
 
     public String getUserId(){
-        return loginUser.map(OAuth2UserInfo::email).orElse(null);
+        return user.map(OAuth2UserInfo::email).orElse(null);
     }
 
     public String getName(){
-        return loginUser.map(OAuth2UserInfo::name).orElse(null);
+        return user.map(OAuth2UserInfo::name).orElse(null);
     }
 
     public boolean isVideoOfUser(@NonNull Video video){
@@ -29,7 +29,7 @@ public class SignedInUser {
 
         if(video.getPath() == null) throw new IllegalArgumentException("video path is null");
 
-        String googleEmail = loginUser.map(OAuth2UserInfo::email).orElse("");
+        String googleEmail = user.map(OAuth2UserInfo::email).orElse("");
 
         if(googleEmail.isBlank()) return false;
 

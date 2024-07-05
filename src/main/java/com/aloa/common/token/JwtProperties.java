@@ -1,4 +1,4 @@
-package com.aloa.configuration.oauth.provider;
+package com.aloa.common.token;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

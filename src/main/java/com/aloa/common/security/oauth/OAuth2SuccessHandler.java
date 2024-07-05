@@ -1,8 +1,8 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common.security.oauth;
 
 import com.aloa.common.token.Token;
 import com.aloa.common.token.TokenRepository;
-import com.aloa.configuration.oauth.provider.AuthTokenProvider;
+import com.aloa.common.token.AuthTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +38,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         var redirectUrl = UriComponentsBuilder.fromUriString(URI)
                 .build().toString();
 
-        response.setHeader("accessToken", accessToken);
+        response.setHeader("Authorization", accessToken);
         response.sendRedirect(redirectUrl);
     }
 }

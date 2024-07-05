@@ -1,4 +1,4 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;

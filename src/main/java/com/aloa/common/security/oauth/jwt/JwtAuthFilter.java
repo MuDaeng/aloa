@@ -1,8 +1,9 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common.security.oauth.jwt;
 
 import com.aloa.common.token.TokenRepository;
+import com.aloa.common.user.entitiy.primarykey.UserRole;
 import com.aloa.common.user.repository.UserRepository;
-import com.aloa.configuration.oauth.provider.AuthTokenProvider;
+import com.aloa.common.token.AuthTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -37,22 +39,19 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         authHeader = authHeader.replace("Bearer ", "").replace("\"", "");
 
+
         if(!authTokenProvider.verifyToken(authHeader)){
-            var token = tokenRepository.findByAccessToken(authHeader);
-            var refreshToken = token.orElseThrow()
-                    .getRefreshToken();
-            if(!authTokenProvider.verifyToken(refreshToken)){
-                throw new IllegalArgumentException("실패");
+            authHeader = authTokenProvider.reissueAccessToken(authHeader);
+
+            if(authHeader == null || authHeader.isBlank()) {
+                throw new JwtException("Invalid token");
             }
         }
 
-        var user = userRepository.findByGoogleUserId(authTokenProvider.getUserId(authHeader))
-                .orElseThrow(() -> new IllegalArgumentException("인증토큰이 이상합니다."));
-
-        var oAuth2UserInfo = OAuth2UserMapper.INSTANCE.toOAuth2UserInfo(user);
+        var oAuth2UserInfo = authTokenProvider.tokenToOAuth2UserInfo(authHeader);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(oAuth2UserInfo, "",
-                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().getCode())));
+                List.of(new SimpleGrantedAuthority("ROLE_" + UserRole.USER.getCode())));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         filterChain.doFilter(request, response);

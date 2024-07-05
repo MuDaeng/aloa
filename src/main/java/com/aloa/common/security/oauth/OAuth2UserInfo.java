@@ -1,4 +1,4 @@
-package com.aloa.configuration.oauth;
+package com.aloa.common.security.oauth;
 
 import com.aloa.common.user.entitiy.User;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
