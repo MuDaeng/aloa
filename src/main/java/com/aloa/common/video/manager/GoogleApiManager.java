@@ -52,7 +52,7 @@ public class GoogleApiManager {
                 .build();
     }
 
-    public VideoSnippet getYoutubeSnippet(@NonNull String videoId){
+    private VideoSnippet getYoutubeSnippet(@NonNull String videoId){
         Optional<VideoListResponse> response;
 
         try {
@@ -68,6 +68,7 @@ public class GoogleApiManager {
         }
 
         return response.map(VideoListResponse::getItems)
+                .filter(list -> !list.isEmpty())
                 .map(List::getFirst)
                 .map(com.google.api.services.youtube.model.Video::getSnippet)
                 .orElse(null);
