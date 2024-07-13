@@ -30,13 +30,19 @@ public class VideoSaveManager {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyDownloading(@NonNull Video video) {
-        video.setCalculationState(CalculationState.DOWNLOADING);
+        changeCalculationState(video, CalculationState.DOWNLOADING);
     }
 
     //비디오 계산용
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyCalculating(@NonNull Video video){
-        video.setCalculationState(CalculationState.CALCULATING);
+        changeCalculationState(video, CalculationState.CALCULATING);
+    }
+
+    private void changeCalculationState(Video video, @NonNull CalculationState state) {
+        video.setCalculationState(state);
+        videoRepository.save(video);
+        saveVideoHist(video);
     }
 
     public void saveVideoHist(@NonNull Video video) {

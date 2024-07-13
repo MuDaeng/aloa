@@ -1,16 +1,22 @@
 package com.aloa.online.video.calculator;
 
 import com.aloa.common.card.entity.Card;
+import com.aloa.common.util.CropVideoNameInfo;
+import com.aloa.common.util.VideoFileUtils;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.entity.VideoCalculationResult;
 import com.aloa.common.video.manager.VideoSaveManager;
+import com.aloa.common.video.validator.VideoValidator;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -18,22 +24,33 @@ import java.util.*;
 public class VideoCalculator {
 
     private final VideoSaveManager videoSaveManager;
+    private final VideoValidator videoValidator;
+    private final VideoFileUtils videoFileUtils;
 
-    public void calculate(@NonNull Video video) {
-        //
-
-        videoSaveManager.notifyDownloading(video);
-
-        /** 구글에서 유튜브 정보 가져옴 */
-
-        /** */
+    public void calculate(@NonNull Video video, String outputFilePath) {
 
         videoSaveManager.notifyCalculating(video);
         //for문으로 계산
+
+        var videoFileName = videoValidator.extractVideoId(video.getPath());
+
+        final CropVideoNameInfo cropVideoNames;
+
+        try {
+            cropVideoNames = videoFileUtils.cropVideo(videoFileName);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        var imageFileList = videoFileUtils.getImageList(cropVideoNames.getZName());
+
+
         //독립시행 종속시행 포함
         Map<Card, VideoCalculationResult> cardCalculationMap = initCalculation(video, false);
 
         Map<Card, VideoCalculationResult> cardCalculationIndependentTrials = initCalculation(video, true);
+
+
 
         for(;;) {
             String z = "";

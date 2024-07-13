@@ -37,10 +37,16 @@ public class VideoValidator {
     public String extractVideoId(String path){
         String[] split = path.split("\\?");
 
-        return Stream.of(split)
+        var videoId = Stream.of(split)
                 .filter(str -> str.contains("v="))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 URL을 입력했습니다."))
                 .replace("v=", "");
+
+        if(videoId.contains("&")){
+            videoId = videoId.substring(0, videoId.indexOf("&"));
+        }
+
+        return videoId;
     }
 }

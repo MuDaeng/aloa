@@ -22,6 +22,7 @@ configurations {
 
 repositories {
     mavenCentral()
+
 }
 
 ext {
@@ -66,6 +67,14 @@ dependencies {
     implementation 'com.google.http-client:google-http-client-jackson2:1.39.2'
     implementation 'org.jcodec:jcodec-javase:0.2.5'
     implementation 'org.jcodec:jcodec:0.2.5'
+
+    //FFMPEG
+    implementation group: 'net.bramp.ffmpeg', name: 'ffmpeg', version: '0.7.0'
+
+    //테서렉트
+    implementation 'net.sourceforge.tess4j:tess4j:5.12.0'
+    //OpenCV 이미지 편집기
+    implementation 'org.bytedeco:javacv-platform:1.5.10'
 
     implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'

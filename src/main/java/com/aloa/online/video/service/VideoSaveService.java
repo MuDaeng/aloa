@@ -9,6 +9,7 @@ import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.manager.GoogleApiManager;
 import com.aloa.common.video.manager.VideoSaveManager;
 import com.aloa.common.video.validator.VideoValidator;
+import com.aloa.common.video.youtube.YoutubeDownloader;
 import com.aloa.online.video.calculator.VideoCalculator;
 import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import com.aloa.online.video.dto.VideoRegisterDTO;
@@ -32,9 +33,9 @@ public class VideoSaveService {
     private final VideoValidator videoValidator;
     private final GoogleApiManager googleApiManager;
     private final CharacterValidator characterValidator;
-    private final VideoCalculator videoCalculator;
+    private final YoutubeDownloader youtubeDownloader;
 
-    private final Executor calculationExecutor;
+    private final Executor downloadExecutor;
 
     public void regist(@Valid VideoRegisterDTO videoRegisterDTO){
         final String path = videoRegisterDTO.getPath();
@@ -65,7 +66,7 @@ public class VideoSaveService {
 
         videoSaveManager.regVideo(youtubeVideo);
 
-        requestCalculation(youtubeVideo);
+        requestDownload(youtubeVideo);
     }
 
 
@@ -80,7 +81,7 @@ public class VideoSaveService {
         video.mapCharacter(character);
     }
 
-    private void requestCalculation(Video video){
-        CompletableFuture<Void> requestAsync = CompletableFuture.runAsync(() -> videoCalculator.calculate(video), calculationExecutor);
+    private void requestDownload(Video video){
+        CompletableFuture.runAsync(() -> youtubeDownloader.download(video), downloadExecutor);
     }
 }

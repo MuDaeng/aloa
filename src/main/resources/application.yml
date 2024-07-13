@@ -26,8 +26,12 @@ youtube :
 jwt :
   secret-key: 810dbe9a151bc9fe4631e8e4a736f2fb49d8e43c1489e07e046ec1c15e1dff91e88c81abf497d17ce2f367f8c2d766abb6cdcd5f7bd9dd25cd0d6717dca04053
   refresh-expiration-minutes : 4320
-  access-expiration-minutes: 10
+  access-expiration-minutes: 600
   issuer: mudaeng
+
+ffmpeg :
+  ffmpeg-path : src\main\resources\ffmpeg\bin\ffmpeg.exe
+  ffprobe-path : src\main\resources\ffmpeg\bin\ffprobe.exe
 
 springdoc:
   swagger-ui:
