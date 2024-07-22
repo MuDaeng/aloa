@@ -1,13 +1,11 @@
 package com.aloa.common.video.entity;
 
 import com.aloa.common.card.entity.Engrave;
-import com.aloa.common.user.entitiy.LostArkCharacter;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
@@ -30,16 +28,15 @@ public class Video {
     @Column(length = 1500)
     private String description;
 
-    private Long expeditionId;
-    private Integer characterSequence;
-
     private String clientVersion;
 
     @Enumerated(EnumType.ORDINAL)
+    @Setter
     private Engrave engrave;
 
     @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
+    @Setter
     private CalculationState calculationState;
 
     @Builder
@@ -51,22 +48,5 @@ public class Video {
         this.title = title;
         this.id = id;
         this.clientVersion = clientVersion;
-    }
-
-    public void mapCharacter(@NonNull @Valid LostArkCharacter lostArkCharacter) {
-        this.expeditionId = lostArkCharacter.getExpeditionId();
-        this.characterSequence = lostArkCharacter.getSequence();
-    }
-
-    public void setCalculationState(@NonNull @Valid CalculationState calculationState) {
-        this.calculationState = calculationState;
-    }
-
-    public void setClientVersion(@NonNull @Valid String clientVersion) {
-        this.clientVersion = clientVersion;
-    }
-
-    public void setEngrave(@NonNull @Valid Engrave engrave) {
-        this.engrave = engrave;
     }
 }

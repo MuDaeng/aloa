@@ -25,13 +25,10 @@ public class VideoCalculationResult {
     private boolean independentTrials;
 
     @Builder
-    public VideoCalculationResult(@Valid Video video, Card card, boolean independentTrials) {
+    public VideoCalculationResult(@Valid Video video, Card card, int cnt, boolean independentTrials) {
         this.videoId = video.getId();
         this.card = card;
         this.independentTrials = independentTrials;
-    }
-
-    public void incrementCnt() {
-        this.cnt++;
+        this.cnt = cnt;
     }
 }

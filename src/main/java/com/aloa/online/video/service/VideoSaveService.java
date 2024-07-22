@@ -1,29 +1,31 @@
 package com.aloa.online.video.service;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.client.entity.ClientVersion;
+import com.aloa.common.client.manager.ClientVersionManager;
 import com.aloa.common.user.validator.CharacterValidator;
-import com.aloa.common.util.SignedInUser;
-import com.aloa.common.util.SignedInUserUtil;
+import com.aloa.common.util.ChosungExtractor;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
-import com.aloa.common.video.manager.GoogleApiManager;
+import com.aloa.common.video.entity.VideoMapping;
+import com.aloa.common.video.handler.GoogleApiManager;
+import com.aloa.common.video.handler.VideoValidator;
+import com.aloa.common.video.handler.YoutubeInfo;
 import com.aloa.common.video.manager.VideoSaveManager;
-import com.aloa.common.video.validator.VideoValidator;
-import com.aloa.common.video.youtube.YoutubeDownloader;
-import com.aloa.online.video.calculator.VideoCalculator;
 import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import com.aloa.online.video.dto.VideoRegisterDTO;
+import com.aloa.online.video.event.VideoRegEvent;
 import com.aloa.online.video.mapper.CharacterValidatorMapper;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +35,8 @@ public class VideoSaveService {
     private final VideoValidator videoValidator;
     private final GoogleApiManager googleApiManager;
     private final CharacterValidator characterValidator;
-    private final YoutubeDownloader youtubeDownloader;
-
-    private final Executor downloadExecutor;
+    private final ClientVersionManager clientVersionManager;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public void regist(@Valid VideoRegisterDTO videoRegisterDTO){
         final String path = videoRegisterDTO.getPath();
@@ -51,26 +52,29 @@ public class VideoSaveService {
 
         if(youtubeVideo == null) throw new IllegalArgumentException("잘못된 경로입니다.");
 
-        SignedInUser signedInUser = SignedInUserUtil.getSignedInUser();
+        var video = toVideo(youtubeVideo);
 
-        if(!signedInUser.isVideoOfUser(youtubeVideo)) throw new IllegalArgumentException("다른사람의 영상입니다.");
+        var videoMapping = VideoMapping.createVideoMapping();
 
-        if(!(videoRegisterDTO.getCharacterId() == null)) mapCharacter(youtubeVideo, videoRegisterDTO.getCharacterId());
+        if(!videoValidator.isVideoOfUser(youtubeVideo.channelId())) throw new IllegalArgumentException("다른사람의 영상입니다.");
+
+        Optional.ofNullable(videoRegisterDTO.getCharacterId())
+                .ifPresent(characterId -> mapCharacter(videoMapping, characterId));
 
         Map<String, Engrave> engraveMap = new HashMap<>();
         engraveMap.put("EMPRESS", Engrave.EMPRESS);
         engraveMap.put("EMPEROR", Engrave.EMPEROR);
-        youtubeVideo.setEngrave(engraveMap.get(engrave));
+        video.setEngrave(engraveMap.get(engrave));
 
-        youtubeVideo.setCalculationState(CalculationState.WAITING);
+        video.setCalculationState(CalculationState.WAITING);
 
-        videoSaveManager.regVideo(youtubeVideo);
+        videoSaveManager.regVideo(video, videoMapping);
 
-        requestDownload(youtubeVideo);
+        applicationEventPublisher.publishEvent(new VideoRegEvent(video.getId()));
     }
 
 
-    public void mapCharacter(@NonNull Video video, @NonNull @Valid LostArkCharacterIdDTO lostArkCharacterIdDTO){
+    public void mapCharacter(VideoMapping videoMapping, @NonNull @Valid LostArkCharacterIdDTO lostArkCharacterIdDTO){
         var character = CharacterValidatorMapper.INSTANCE.toLostArkCharacter(lostArkCharacterIdDTO);
         character = characterValidator.findCharacter(character);
 
@@ -78,10 +82,22 @@ public class VideoSaveService {
             throw new IllegalArgumentException("잘못된 캐릭터정보를 입력하였습니다.");
         }
 
-        video.mapCharacter(character);
+        videoMapping.mapCharacter(character);
     }
 
-    private void requestDownload(Video video){
-        CompletableFuture.runAsync(() -> youtubeDownloader.download(video), downloadExecutor);
+    private Video toVideo(YoutubeInfo youtubeInfo){
+        return Video.builder()
+                .title(youtubeInfo.title())
+                .description(youtubeInfo.description())
+                .path(youtubeInfo.path())
+                .youtubeVideoId(youtubeInfo.youtubeVideoId())
+                .chosung(ChosungExtractor.extractChosung(youtubeInfo.title()))
+                .clientVersion(
+                        Optional.ofNullable(
+                                        clientVersionManager.getClientVersion(youtubeInfo.publishedAt())
+                                )
+                                .map(ClientVersion::getVersion)
+                                .orElse(null))
+                .build();
     }
 }

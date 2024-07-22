@@ -1,10 +1,7 @@
 package com.aloa.common.video.manager;
 
 import com.aloa.common.video.entity.*;
-import com.aloa.common.video.repository.VideoCalculationResultHistRepository;
-import com.aloa.common.video.repository.VideoCalculationResultRepository;
-import com.aloa.common.video.repository.VideoHistRepository;
-import com.aloa.common.video.repository.VideoRepository;
+import com.aloa.common.video.repository.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -19,12 +16,17 @@ import java.util.List;
 public class VideoSaveManager {
     private final VideoRepository videoRepository;
     private final VideoHistRepository videoHistRepository;
+    private final VideoMappingRepository videoMappingRepository;
     private final VideoCalculationResultRepository videoCalculationResultRepository;
     private final VideoCalculationResultHistRepository videoCalculationResultHistRepository;
 
-    public Video regVideo(@NonNull Video video) {
+    public Video regVideo(@NonNull Video video, VideoMapping videoMapping) {
         var result = videoRepository.save(video);
         this.saveVideoHist(result);
+
+        videoMapping.setVideoId(result.getId());
+        videoMappingRepository.save(videoMapping);
+
         return result;
     }
 
@@ -37,6 +39,10 @@ public class VideoSaveManager {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyCalculating(@NonNull Video video){
         changeCalculationState(video, CalculationState.CALCULATING);
+    }
+
+    public void nofityCompleted(@NonNull Video video) {
+        changeCalculationState(video, CalculationState.COMPLETED);
     }
 
     private void changeCalculationState(Video video, @NonNull CalculationState state) {
@@ -52,10 +58,9 @@ public class VideoSaveManager {
         videoHistRepository.save(new VideoHist(video, nextSeq));
     }
 
-    public List<VideoCalculationResult> regCalculationResult(@NonNull List<VideoCalculationResult> videoCalculationResultList) {
-        var result = videoCalculationResultRepository.saveAll(videoCalculationResultList);
+    public void regCalculationResult(@NonNull List<VideoCalculationResult> videoCalculationResultList) {
+        videoCalculationResultRepository.saveAll(videoCalculationResultList);
         saveCalculationResultHist(videoCalculationResultList);
-        return result;
     }
 
     public void saveCalculationResultHist(@NonNull List<VideoCalculationResult> videoCalculationResultList) {

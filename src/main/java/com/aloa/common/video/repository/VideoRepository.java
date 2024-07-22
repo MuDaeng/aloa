@@ -1,7 +1,6 @@
 package com.aloa.common.video.repository;
 
 import com.aloa.common.video.entity.Video;
-import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -15,8 +14,4 @@ public interface VideoRepository extends JpaRepository<Video, Long> {
     List<Video> findByChosungStartsWith(String chosung);
 
     List<Video> findByTitleStartsWith(String title);
-
-    List<Video> findByExpeditionId(@NonNull Long expeditionId);
-
-    List<Video> findByExpeditionIdAndCharacterSequence(@NonNull Long expeditionId, @NonNull Integer characterSequence);
 }

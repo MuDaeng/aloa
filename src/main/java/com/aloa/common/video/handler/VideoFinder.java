@@ -1,4 +1,4 @@
-package com.aloa.common.video.finder;
+package com.aloa.common.video.handler;
 
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.repository.VideoRepository;
@@ -18,5 +18,9 @@ public class VideoFinder {
 
     public Optional<Video> findByPath(String path) {
         return videoRepository.findByPath(path);
+    }
+
+    public Optional<Video> findByYoutubeVideoId(String youtubeVideoId){
+        return videoRepository.findByYoutubeVideoId(youtubeVideoId);
     }
 }

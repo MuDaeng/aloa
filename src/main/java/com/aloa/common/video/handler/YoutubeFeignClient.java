@@ -1,6 +1,5 @@
-package com.aloa.common.video.manager;
+package com.aloa.common.video.handler;
 
-import com.google.api.services.youtube.YouTube;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

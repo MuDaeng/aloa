@@ -1,8 +1,10 @@
-package com.aloa.common.video.validator;
+package com.aloa.common.video.handler;
 
+import com.aloa.common.user.repository.GoogleMappingRepository;
+import com.aloa.common.util.SignedInUserUtil;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
-import com.aloa.common.video.repository.VideoRepository;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -12,17 +14,18 @@ import java.util.stream.Stream;
 @Component
 @RequiredArgsConstructor
 public class VideoValidator {
-    private final VideoRepository videoRepository;
+    private final VideoFinder videoFinder;
+    private final GoogleMappingRepository googleMappingRepository;
 
     public boolean isDuplicated(String path) {
 
         //유튜브경로로 이미 유튜브가 등록되어있는지 검색
-        var videoByPath = videoRepository.findByPath(path);
+        var videoByPath = videoFinder.findByPath(path);
 
         if(videoByPath.isPresent()) return true;
         var youtubeVideoId = extractVideoId(path);
 
-        var videoByYoutubeVideoId = videoRepository.findByYoutubeVideoId(youtubeVideoId);
+        var videoByYoutubeVideoId = videoFinder.findByYoutubeVideoId(youtubeVideoId);
 
         return videoByYoutubeVideoId.isPresent();
     }
@@ -48,5 +51,19 @@ public class VideoValidator {
         }
 
         return videoId;
+    }
+
+    public boolean isVideoOfUser(@NonNull String channelId){
+        var signedInUser = SignedInUserUtil.getSignedInUser();
+
+        if(!signedInUser.isSignedIn()) return false;
+
+        Optional.of(channelId)
+                .filter(str -> !str.isBlank())
+                .orElseThrow(() -> new IllegalArgumentException("video path is null"));
+
+        String googleEmail = signedInUser.getUserId();
+
+        return googleMappingRepository.findByGoogleUserId(googleEmail).isPresent();
     }
 }

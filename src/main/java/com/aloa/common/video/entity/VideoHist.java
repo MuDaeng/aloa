@@ -33,9 +33,6 @@ public class VideoHist {
     @Column(length = 1500)
     private String description;
 
-    private Long expeditionId;
-    private Integer characterSequence;
-
     private String clientVersion;
 
     @Enumerated(EnumType.ORDINAL)
@@ -55,8 +52,6 @@ public class VideoHist {
         this.path = video.getPath();
         this.youtubeVideoId = video.getYoutubeVideoId();
         this.description = video.getDescription();
-        this.expeditionId = video.getExpeditionId();
-        this.characterSequence = video.getCharacterSequence();
         this.clientVersion = video.getClientVersion();
         this.engrave = video.getEngrave();
         this.calculationState = video.getCalculationState();

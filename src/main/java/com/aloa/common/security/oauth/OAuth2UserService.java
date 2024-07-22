@@ -1,10 +1,14 @@
 package com.aloa.common.security.oauth;
 
 import com.aloa.common.security.PrincipalDetails;
+import com.aloa.common.user.entitiy.GoogleMapping;
+import com.aloa.common.user.repository.GoogleMappingRepository;
 import com.aloa.common.user.repository.UserRepository;
+import com.aloa.common.video.handler.GoogleApiManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,8 @@ import java.util.Map;
 public class OAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final GoogleMappingRepository googleMappingRepository;
+    private final GoogleApiManager googleApiManager;
 
     @Transactional
     @Override
@@ -34,16 +40,24 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
                 .email((String) oAuth2UserAttributes.get("email"))
                 .build();
 
+        var oAuthAccessToken = userRequest.getAccessToken();
+
         // 5. 회원가입 및 로그인
-        getOrSave(oAuth2UserInfo);
+        getOrSave(oAuth2UserInfo, oAuthAccessToken);
 
         // 6. OAuth2User로 반환
         return new PrincipalDetails(oAuth2UserInfo, oAuth2UserAttributes, userNameAttributeName);
     }
 
-    private void getOrSave(OAuth2UserInfo oAuth2UserInfo) {
+    private void getOrSave(OAuth2UserInfo oAuth2UserInfo, OAuth2AccessToken oAuth2AccessToken) {
         var user = userRepository.findByGoogleUserId(oAuth2UserInfo.email())
                 .orElseGet(oAuth2UserInfo::toUser);
         userRepository.save(user);
+
+        var channelId = googleApiManager.getChannelId(oAuth2AccessToken.getTokenValue());
+
+        var googleMapping = GoogleMapping.mapChannel(oAuth2UserInfo.email(), channelId);
+
+        googleMappingRepository.save(googleMapping);
     }
 }

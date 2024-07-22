@@ -4,5 +4,5 @@ import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder(access = AccessLevel.PACKAGE)
-public record CropVideoNameInfo(String z, String x) {
+public record CropVideoTotal(String zName, String xName, String zImage, String xImage) {
 }

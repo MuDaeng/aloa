@@ -37,6 +37,8 @@ public class VideoFileConfig {
     public Tesseract tesseract(){
         Tesseract tesseract = new Tesseract();
         tesseract.setLanguage("kor");
+        tesseract.setOcrEngineMode(1);
+        tesseract.setPageSegMode(6);
         return tesseract;
     }
 }
