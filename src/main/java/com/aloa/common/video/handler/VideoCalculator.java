@@ -12,7 +12,6 @@ import com.aloa.common.video.manager.VideoSaveManager;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +28,7 @@ public class VideoCalculator {
 
     private final VideoSaveManager videoSaveManager;
     private final VideoFinder videoFinder;
-    private final CalculationReservedVideoRepository calculationReservedVideoRepository;;
+    private final CalculationReservedVideoRepository calculationReservedVideoRepository;
     private final VideoValidator videoValidator;
     private final VideoFileUtils videoFileUtils;
 

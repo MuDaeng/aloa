@@ -3,8 +3,6 @@ package com.aloa.common.card.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
 @AllArgsConstructor
 public enum Card {

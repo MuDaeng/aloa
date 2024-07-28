@@ -1,6 +1,5 @@
 package com.aloa.common.util;
 
-import com.aloa.common.security.PrincipalDetails;
 import com.aloa.common.security.oauth.OAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

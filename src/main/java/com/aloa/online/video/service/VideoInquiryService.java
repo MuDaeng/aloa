@@ -2,10 +2,8 @@ package com.aloa.online.video.service;
 
 import com.aloa.common.user.entitiy.LostArkCharacter;
 import com.aloa.common.user.repository.LostArkCharacterRepository;
-import com.aloa.common.user.repository.UserRepository;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.entity.VideoCalculationResult;
-import com.aloa.common.video.entity.VideoMapping;
 import com.aloa.common.video.handler.VideoFinder;
 import com.aloa.online.video.dto.VideoInquiryDTO;
 import com.aloa.online.video.mapper.VideoInquiryMapper;
@@ -15,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 
 @Service
@@ -23,7 +20,6 @@ import java.util.function.Predicate;
 public class VideoInquiryService {
     private final VideoFinder videoFinder;
     private final LostArkCharacterRepository lostArkCharacterRepository;
-    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public VideoInquiryDTO findByVideoId(@RequestParam Long videoId) {
