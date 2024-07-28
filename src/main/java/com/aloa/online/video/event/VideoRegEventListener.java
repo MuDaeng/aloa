@@ -6,9 +6,8 @@ import com.aloa.common.video.handler.VideoFinder;
 import com.aloa.common.video.handler.YoutubeDownloader;
 import com.aloa.common.video.manager.VideoSaveManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -24,7 +23,7 @@ public class VideoRegEventListener {
     private final VideoCalculator videoCalculator;
     private final Executor calculationExecutor;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void videoRegEvent(VideoRegEvent event) {
         var videoOptional = videoFinder.findById(event.getVideoId());

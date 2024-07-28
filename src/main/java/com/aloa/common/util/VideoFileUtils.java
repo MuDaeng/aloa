@@ -1,8 +1,11 @@
 package com.aloa.common.util;
 
+import com.aloa.common.video.handler.AloaStarFeignClient;
 import com.aloa.common.video.handler.OcrResult;
+import com.aloa.common.video.handler.ReCalculationFiles;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.bramp.ffmpeg.FFprobe;
 import net.bramp.ffmpeg.probe.FFmpegProbeResult;
 import net.bramp.ffmpeg.probe.FFmpegStream;
@@ -21,37 +24,27 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class VideoFileUtils {
     private final FFprobe ffprobe;
+    private final Tesseract tesseract;
     private final SyncProcessor syncProcessor;
+    private final AloaStarFeignClient aloaStarFeignClient;
+
     private static final String ffmPegPath = "src/main/resources/ffmpeg/bin";
     private static final String imageDir = ffmPegPath + "/image/";
     private static final String videoDir = ffmPegPath + "/video/";
     private static final String crop = "_crop_";
     private static final String imagePrefix = "/frame-%05d.png";
     private static final int fps = 3;
-    private final Tesseract tesseract;
-
-    public double getDuration(String videoFilePath) throws IOException {
-        FFmpegProbeResult probeResult = ffprobe.probe(videoFilePath);
-
-        return probeResult.getFormat().duration;
-    }
-
-    private int getFps(String videoFilePath) throws IOException {
-        FFmpegProbeResult probeResult = ffprobe.probe(videoFilePath);
-        return probeResult.getStreams().getFirst().avg_frame_rate.intValue();
-    }
 
     public void extractFrames(String videoName) {
+        log.debug("extract frames from {}", videoName);
         Path directory = Paths.get(imageDir + videoName);
         try{
             Files.createDirectory(directory);
@@ -73,6 +66,7 @@ public class VideoFileUtils {
     }
 
     public CropVideoTotal cropVideo(String videoName) throws IOException, InterruptedException {
+        log.debug("crop video from {}", videoName);
         var cropName = executeFfmpeg(videoName, CropType.NAME);
         var cropImage = executeFfmpeg(videoName, CropType.IMAGE);
 
@@ -141,12 +135,13 @@ public class VideoFileUtils {
     }
 
     public void preprocessOcrImage(List<String> dirList){
+        log.debug("preprocess ocr image {}", dirList);
         Loader.load(opencv_imgcodecs.class);
         for(String dirName : dirList){
             var dir = new File(imageDir + dirName);
             var fileNames = dir.list();
             for(var fileName : Objects.requireNonNull(fileNames)){
-                var filePath = imageDir + dirName + fileName;
+                var filePath = imageDir + dirName + "/" + fileName;
                 preprocessOcrImage(filePath);
             }
         }
@@ -164,19 +159,24 @@ public class VideoFileUtils {
         opencv_imgcodecs.imwrite(filePath, binaryMat);
     }
 
-    public OcrResult getOcrImageResult(List<String> dirList){
+    public OcrResult getOcrImageResult(List<String> cardNameList, List<String> cardImageList){
+        log.debug("getOcrImageResult {}", cardNameList);
         var list = new ArrayList<List<String>>();
-        for(String dirName : dirList){
-            var dir = new File(imageDir + dirName);
+        for(var i = 0; i < cardNameList.size(); i++){
+            var cardName = cardNameList.get(i);
+            var imageName = cardImageList.get(i);
+            var dir = new File(imageDir + cardName);
             var fileNames = Objects.requireNonNull(dir.list());
-            list.add(getOcrImageList(dirName, fileNames));
+            list.add(getOcrImageList(cardName, fileNames, imageName));
         }
 
         return new OcrResult(list.get(0), list.get(1));
     }
 
-    private List<String> getOcrImageList(String dirName, String[] fileNames){
-        var ocrList = new ArrayList<String>();
+    private List<String> getOcrImageList(String cardName, String[] fileNames, String cardImage){
+        var ocrList = new String[fileNames.length];
+        var failMap = new HashMap<String, Integer>();
+
         for(var i = 0; i < fileNames.length; i++){
                 var fileName = fileNames[i];
 
@@ -184,17 +184,35 @@ public class VideoFileUtils {
                     System.out.println("Z퍼센트 : " + (i * 100 / fileNames.length));
                 }
                 try {
-                    var file = new File(dirName + fileName);
+                    var file = new File(imageDir + cardName + "/" + fileName);
                     var ocrStr = Optional.of(tesseract.doOCR(file).replace("\n", ""))
-                            .filter(str -> !str.isBlank())
+                            .filter(str -> !str.isEmpty())
                             .orElse(null);
-                    ocrList.add(ocrStr);
+                    ocrList[i] = ocrStr;
+
+                    if(ocrStr == null){
+                        failMap.put(fileName, i);
+                    }
                 } catch (Exception e) {
-                    ocrList.add("error");
+                    ocrList[i] = "error";
                 }
 
+
         }
-        return ocrList;
+
+        if(!failMap.isEmpty()){
+            var absolutePath = Optional.of(new File(imageDir + cardImage))
+                    .map(File::getAbsolutePath)
+                    .orElseThrow(() -> new IllegalArgumentException("directory is not found"));
+            var recalculationFiles = new ReCalculationFiles(absolutePath, failMap.keySet());
+            var recalculationResults = aloaStarFeignClient.recalculateForImage(recalculationFiles);
+
+            recalculationResults.forEach(
+                    result -> ocrList[failMap.get(result.fileName())] = result.cardName()
+            );
+        }
+
+        return List.of(ocrList);
     }
 
     private String getFormat(String videoName){

@@ -1,6 +1,7 @@
 package com.aloa.common.util;
 
 import com.aloa.common.security.PrincipalDetails;
+import com.aloa.common.security.oauth.OAuth2UserInfo;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -18,9 +19,10 @@ public class SignedInUserUtil {
 
         Object principal = authentication.getPrincipal();
 
-        if(principal instanceof PrincipalDetails principalDetails) {
-            return SignedInUser.builder().user(Optional.ofNullable(principalDetails.getOAuth2UserInfo())).build();
+        if(principal instanceof OAuth2UserInfo oAuth2UserInfo) {
+            return SignedInUser.builder().user(Optional.of(oAuth2UserInfo)).build();
         }
+
 
         return empty;
     }

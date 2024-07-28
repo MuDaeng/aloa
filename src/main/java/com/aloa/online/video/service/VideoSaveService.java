@@ -38,7 +38,7 @@ public class VideoSaveService {
     private final ClientVersionManager clientVersionManager;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public void regist(@Valid VideoRegisterDTO videoRegisterDTO){
+    public void registVideo(@Valid VideoRegisterDTO videoRegisterDTO){
         final String path = videoRegisterDTO.getPath();
         final String engrave = videoRegisterDTO.getEngrave();
 

@@ -2,6 +2,8 @@ package com.aloa;
 
 import com.aloa.common.token.JwtProperties;
 import com.aloa.configuration.properties.FFmpegProperties;
+import org.bytedeco.javacpp.Loader;
+import org.bytedeco.opencv.helper.opencv_imgcodecs;
 import org.opencv.core.Core;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,6 +17,7 @@ public class AloaApplication {
         // Load OpenCV native library
         try {
             System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+            Loader.load(opencv_imgcodecs.class);
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Failed to load OpenCV library: " + e.getMessage());
         }

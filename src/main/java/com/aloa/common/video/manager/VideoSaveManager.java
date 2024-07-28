@@ -60,7 +60,7 @@ public class VideoSaveManager {
 
     public void regCalculationResult(@NonNull List<VideoCalculationResult> videoCalculationResultList) {
         videoCalculationResultRepository.saveAll(videoCalculationResultList);
-        saveCalculationResultHist(videoCalculationResultList);
+//        saveCalculationResultHist(videoCalculationResultList);
     }
 
     public void saveCalculationResultHist(@NonNull List<VideoCalculationResult> videoCalculationResultList) {

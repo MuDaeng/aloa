@@ -15,8 +15,8 @@ public class ReservedVideoList {
         calculationReservedVideoList = new ArrayList<>();
     }
 
-    public boolean addVideo(@NonNull @Valid Video video) {
-        return calculationReservedVideoList.add(new CalculationReservedVideo(video));
+    public void addVideo(@NonNull @Valid Video video) {
+        calculationReservedVideoList.add(new CalculationReservedVideo(video));
     }
 
     public boolean addVideoList(@NonNull @Valid List<Video> videoList) {
@@ -46,4 +46,6 @@ public class ReservedVideoList {
     public List<CalculationReservedVideo> getReservedVideoList() {
         return List.copyOf(calculationReservedVideoList);
     }
+
+
 }

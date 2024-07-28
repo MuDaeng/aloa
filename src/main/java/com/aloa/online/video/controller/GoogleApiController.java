@@ -5,13 +5,17 @@ import com.aloa.common.util.VideoFileUtils;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.entity.VideoMapping;
-import com.aloa.common.video.handler.GoogleApiManager;
-import com.aloa.common.video.handler.VideoValidator;
-import com.aloa.common.video.handler.YoutubeDownloader;
+import com.aloa.common.video.handler.*;
 import com.aloa.common.video.manager.VideoSaveManager;
 import com.aloa.online.video.dto.PathDTO;
 import lombok.RequiredArgsConstructor;
 import net.sourceforge.tess4j.Tesseract;
+import org.bytedeco.javacpp.Loader;
+import org.bytedeco.opencv.global.opencv_imgcodecs;
+import org.bytedeco.opencv.global.opencv_imgproc;
+import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.springframework.web.bind.annotation.*;
 
 import javax.imageio.ImageIO;
@@ -33,6 +37,7 @@ public class GoogleApiController {
     private final VideoFileUtils videoFileUtils;
     private final Tesseract tesseract;
     private final VideoValidator videoValidator;
+    private final AloaStarFeignClient aloaStarFeignClient;
 
     @GetMapping("/youtube")
     public void getUri(@RequestParam String path) {
@@ -57,73 +62,78 @@ public class GoogleApiController {
         return videoSaveManager.regVideo(video, new VideoMapping());
     }
 
+    @PostMapping("/tnananan")
+    public List<RecalculationResult> tnanananan(@RequestBody ReCalculationFiles reCalculationFiles) {
+        return aloaStarFeignClient.recalculateForImage(reCalculationFiles);
+    }
+
     @GetMapping("/yanayan")
     public Map<String, List<String>> getYanayan(@RequestParam(required = false) String videoId) {
 
         long start = System.currentTimeMillis();
 
         try {
-            var cropInfo = videoFileUtils.cropVideo(videoId);
-            videoFileUtils.extractFrames(cropInfo.zName());
-            videoFileUtils.extractFrames(cropInfo.xName());
-            videoFileUtils.extractFrames(cropInfo.zImage());
-            videoFileUtils.extractFrames(cropInfo.xImage());
-//
-//            File zfile = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/");
-//            File xfile = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/");
-//
-//            String[] zFiles = zfile.list();
-//            String[] xFiles = xfile.list();
-//            Loader.load(opencv_imgcodecs.class);
-//            List<String> zlist = new ArrayList<>(Objects.requireNonNull(zFiles).length);
-//            List<String> xlist = new ArrayList<>(Objects.requireNonNull(xFiles).length);
-//
-//            for(String zFile : zFiles) {
-//                String zFilePath = "src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/" + zFile;
-//                preset(zFilePath);
-//            }
-//
-//            for(String xFile : xFiles) {
-//                String x = "src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/" + xFile;
-//                preset(x);
-//            }
-//
-//            for (int i = 0; i < zFiles.length;i ++) {
-//                String zFile = zFiles[i];
-//
-//                if ((i * 100 / zFiles.length) % 10 == 0 && ((i * 100 / zFiles.length) != 0)) {
-//                    System.out.println("Z퍼센트 : " + (i * 100 / zFiles.length));
-//                }
-//                try {
-//                    var file = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/" + zFile);
-//                    zlist.add(tesseract.doOCR(file).replace("\n", ""));
-//                } catch (Exception e) {
-//                    zlist.add("error");
-//                }
-//            }
-//
-//            for (int i = 0; i < xFiles.length; i++) {
-//                String xFile = xFiles[i];
-//
-//                if((i * 10000/ xFiles.length ) /100 % 10  == 0 && ((i * 10000/ xFiles.length) / 100 != 0)){
-//                    System.out.println("X퍼센트 : " + (i * 100 / xFiles.length ));
-//                }
-//                try {
-//                    var file = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/" + xFile);
-//                    xlist.add(tesseract.doOCR(file).replace("\n", ""));
-//                } catch (Exception e) {
-//                    xlist.add("error");
-//                }
-//            }
+//            var cropInfo = videoFileUtils.cropVideo(videoId);
+//            videoFileUtils.extractFrames(cropInfo.zName());
+//            videoFileUtils.extractFrames(cropInfo.xName());
+//            videoFileUtils.extractFrames(cropInfo.zImage());
+//            videoFileUtils.extractFrames(cropInfo.xImage());
+
+            File zfile = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/");
+            File xfile = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/");
+
+            String[] zFiles = zfile.list();
+            String[] xFiles = xfile.list();
+            Loader.load(opencv_imgcodecs.class);
+            List<String> zlist = new ArrayList<>(Objects.requireNonNull(zFiles).length);
+            List<String> xlist = new ArrayList<>(Objects.requireNonNull(xFiles).length);
+
+            for(String zFile : zFiles) {
+                String zFilePath = "src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/" + zFile;
+                preset(zFilePath);
+            }
+
+            for(String xFile : xFiles) {
+                String x = "src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/" + xFile;
+                preset(x);
+            }
+
+            for (int i = 0; i < zFiles.length;i ++) {
+                String zFile = zFiles[i];
+
+                if ((i * 100 / zFiles.length) % 10 == 0 && ((i * 100 / zFiles.length) != 0)) {
+                    System.out.println("Z퍼센트 : " + (i * 100 / zFiles.length));
+                }
+                try {
+                    var file = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_z/" + zFile);
+                    zlist.add(tesseract.doOCR(file).replace("\n", ""));
+                } catch (Exception e) {
+                    zlist.add("error");
+                }
+            }
+
+            for (int i = 0; i < xFiles.length; i++) {
+                String xFile = xFiles[i];
+
+                if((i * 10000/ xFiles.length ) /100 % 10  == 0 && ((i * 10000/ xFiles.length) / 100 != 0)){
+                    System.out.println("X퍼센트 : " + (i * 100 / xFiles.length ));
+                }
+                try {
+                    var file = new File("src/main/resources/ffmpeg/bin/image/" + videoId + "_crop_x/" + xFile);
+                    xlist.add(tesseract.doOCR(file).replace("\n", ""));
+                } catch (Exception e) {
+                    xlist.add("error");
+                }
+            }
 
             var result = new HashMap<String, List<String>>();
 
-//            result.put("z", zlist);
-//            result.put("x", xlist);
-//
-//            long end = System.currentTimeMillis();
-//
-//            System.out.println("걸린시간 : " + (end - start) / 1000 + "s");
+            result.put("z", zlist.stream().distinct().toList());
+            result.put("x", xlist.stream().distinct().toList());
+
+            long end = System.currentTimeMillis();
+
+            System.out.println("걸린시간 : " + (end - start) / 1000 + "s");
 
             return result;
 
@@ -191,17 +201,17 @@ public class GoogleApiController {
         }
     }
 
-//    private void preset(String filePath){
-//        Mat zfileMat = opencv_imgcodecs.imread(filePath, Imgcodecs.IMREAD_GRAYSCALE);
-//
-//        Mat blurMat = new Mat();
-//        opencv_imgproc.GaussianBlur(zfileMat, blurMat, new Size(1, 1), 0);
-//
-//        Mat binaryMat = new Mat();
-//        opencv_imgproc.threshold(blurMat, binaryMat, -1, 255, opencv_imgproc.THRESH_OTSU);
-//
-//        opencv_imgcodecs.imwrite(filePath, binaryMat);
-//    }
+    private void preset(String filePath){
+        Mat zfileMat = opencv_imgcodecs.imread(filePath, Imgcodecs.IMREAD_GRAYSCALE);
+
+        Mat blurMat = new Mat();
+        opencv_imgproc.GaussianBlur(zfileMat, blurMat, new Size(1, 1), 0);
+
+        Mat binaryMat = new Mat();
+        opencv_imgproc.threshold(blurMat, binaryMat, -1, 255, opencv_imgproc.THRESH_OTSU);
+
+        opencv_imgcodecs.imwrite(filePath, binaryMat);
+    }
 
     private static File createTempImageFile(BufferedImage image, String outputPath) throws IOException {
         File tempFile = new File(outputPath);

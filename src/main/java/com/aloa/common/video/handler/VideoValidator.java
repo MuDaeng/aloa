@@ -2,6 +2,7 @@ package com.aloa.common.video.handler;
 
 import com.aloa.common.user.repository.GoogleMappingRepository;
 import com.aloa.common.util.SignedInUserUtil;
+import com.aloa.common.util.VideoFileUtils;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import lombok.NonNull;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 public class VideoValidator {
     private final VideoFinder videoFinder;
     private final GoogleMappingRepository googleMappingRepository;
+    private final VideoFileUtils videoFileUtils;
 
     public boolean isDuplicated(String path) {
 
@@ -64,6 +66,6 @@ public class VideoValidator {
 
         String googleEmail = signedInUser.getUserId();
 
-        return googleMappingRepository.findByGoogleUserId(googleEmail).isPresent();
+        return googleMappingRepository.findByGoogleUserId(googleEmail).filter(googleMapping -> channelId.equals(googleMapping.getChannelId())).isPresent();
     }
 }
