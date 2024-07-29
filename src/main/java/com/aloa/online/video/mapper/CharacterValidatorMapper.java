@@ -1,7 +1,6 @@
 package com.aloa.online.video.mapper;
 
 import com.aloa.common.user.entitiy.LostArkCharacter;
-import com.aloa.common.user.entitiy.primarykey.LostArkCharacterPK;
 import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
