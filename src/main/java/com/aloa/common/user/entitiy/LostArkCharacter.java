@@ -1,7 +1,7 @@
 package com.aloa.common.user.entitiy;
 
 import com.aloa.common.user.entitiy.primarykey.LostArkCharacterPK;
-import com.aloa.common.video.entity.Video;
+import com.aloa.common.video.entity.VideoMapping;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -41,11 +41,13 @@ public class LostArkCharacter {
     @Column(nullable = false)
     private boolean deleted;
 
+    private String imageUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Expedition expedition;
 
     @OneToMany
     @JoinColumn(name="expeditionId")
     @JoinColumn(name="characterSequence")
-    private List<Video> videoList;
+    private List<VideoMapping> videoMappingList;
 }

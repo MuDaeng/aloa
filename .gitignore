@@ -28,6 +28,8 @@ out/
 
 /src/main/resources/ffmpeg/
 /src/main/resources/opencv/
+**/src/main/resources/config/
+
 
 ### NetBeans ###
 /nbproject/private/

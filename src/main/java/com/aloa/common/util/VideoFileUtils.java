@@ -1,6 +1,6 @@
 package com.aloa.common.util;
 
-import com.aloa.common.video.handler.AloaStarFeignClient;
+import com.aloa.common.video.feignclient.AloaStarFeignClient;
 import com.aloa.common.video.handler.OcrResult;
 import com.aloa.common.video.handler.ReCalculationFiles;
 import lombok.NonNull;

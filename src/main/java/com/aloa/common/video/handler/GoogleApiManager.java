@@ -23,7 +23,7 @@ public class GoogleApiManager {
     /**
      * apiKey
      */
-    @Value("${youtube.api.key}")
+    @Value("${api.key.youtube}")
     private String apiKey;
 
     private final VideoValidator videoValidator;

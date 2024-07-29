@@ -16,6 +16,7 @@ public interface CharacterValidatorMapper {
     @Mapping(target = "arcana", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "expedition", ignore = true)
-    @Mapping(target = "videoList", ignore = true)
+    @Mapping(target = "videoMappingList", ignore = true)
+    @Mapping(target = "imageUrl", ignore = true)
     LostArkCharacter toLostArkCharacter(LostArkCharacterIdDTO lostArkCharacterIdDTO);
 }
