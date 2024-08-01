@@ -16,8 +16,8 @@ public class AloaApplication {
     public static void main(String[] args) {
         // Load OpenCV native library
         try {
-            System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-            Loader.load(opencv_imgcodecs.class);
+//            System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+//            Loader.load(opencv_imgcodecs.class);
         } catch (UnsatisfiedLinkError e) {
             System.err.println("Failed to load OpenCV library: " + e.getMessage());
         }

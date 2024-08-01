@@ -56,7 +56,7 @@ public class VideoSaveService {
 
         var videoMapping = VideoMapping.createVideoMapping();
 
-        if(!videoValidator.isVideoOfUser(youtubeVideo.channelId())) throw new IllegalArgumentException("다른사람의 영상입니다.");
+//        if(!videoValidator.isVideoOfUser(youtubeVideo.channelId())) throw new IllegalArgumentException("다른사람의 영상입니다.");
 
         Optional.ofNullable(videoRegisterDTO.getCharacterId())
                 .ifPresent(characterId -> mapCharacter(videoMapping, characterId));

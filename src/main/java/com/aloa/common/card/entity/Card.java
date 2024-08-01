@@ -24,6 +24,8 @@ public enum Card {
     재상("재상", Engrave.EMPEROR),
     제후("제후", Engrave.EMPEROR),
     EMPTY("", Engrave.COMMON),
+    BLACK("", Engrave.COMMON),
+    UNDEFINED("", Engrave.COMMON),
     ;
 
     private final String name;

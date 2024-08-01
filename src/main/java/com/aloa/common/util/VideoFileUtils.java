@@ -1,6 +1,7 @@
 package com.aloa.common.util;
 
 import com.aloa.common.video.feignclient.AloaStarFeignClient;
+import com.aloa.common.video.feignclient.vo.RecalculationResult;
 import com.aloa.common.video.handler.OcrResult;
 import com.aloa.common.video.handler.ReCalculationFiles;
 import lombok.NonNull;
@@ -67,12 +68,12 @@ public class VideoFileUtils {
 
     public CropVideoTotal cropVideo(String videoName) throws IOException, InterruptedException {
         log.debug("crop video from {}", videoName);
-        var cropName = executeFfmpeg(videoName, CropType.NAME);
+//        var cropName = executeFfmpeg(videoName, CropType.NAME);
         var cropImage = executeFfmpeg(videoName, CropType.IMAGE);
 
         return CropVideoTotal.builder()
-                .zName(cropName.z())
-                .xName(cropName.x())
+//                .zName(cropName.z())
+//                .xName(cropName.x())
                 .zImage(cropImage.z())
                 .xImage(cropImage.x())
                 .build();
@@ -159,60 +160,45 @@ public class VideoFileUtils {
         opencv_imgcodecs.imwrite(filePath, binaryMat);
     }
 
-    public OcrResult getOcrImageResult(List<String> cardNameList, List<String> cardImageList){
-        log.debug("getOcrImageResult {}", cardNameList);
+    public OcrResult getOcrImageResult(List<String> cardImageList){
+        log.debug("getOcrImageResult {}", cardImageList);
         var list = new ArrayList<List<String>>();
-        for(var i = 0; i < cardNameList.size(); i++){
-            var cardName = cardNameList.get(i);
-            var imageName = cardImageList.get(i);
-            var dir = new File(imageDir + cardName);
+        for (String imageName : cardImageList) {
+            var dir = new File(imageDir + imageName);
             var fileNames = Objects.requireNonNull(dir.list());
-            list.add(getOcrImageList(cardName, fileNames, imageName));
+            list.add(getOcrImageList(fileNames, imageName));
         }
 
         return new OcrResult(list.get(0), list.get(1));
     }
 
-    private List<String> getOcrImageList(String cardName, String[] fileNames, String cardImage){
-        var ocrList = new String[fileNames.length];
-        var failMap = new HashMap<String, Integer>();
+    private List<String> getOcrImageList(String[] fileNames, String cardImage){
+        var absolutePath = Optional.of(new File(imageDir + cardImage))
+                .map(File::getAbsolutePath)
+                .orElseThrow(() -> new IllegalArgumentException("directory is not found"));
 
-        for(var i = 0; i < fileNames.length; i++){
-                var fileName = fileNames[i];
+        int i = 0;
 
-                if ((i * 100 / fileNames.length) % 10 == 0 && ((i * 100 / fileNames.length) != 0)) {
-                    System.out.println("Z퍼센트 : " + (i * 100 / fileNames.length));
-                }
-                try {
-                    var file = new File(imageDir + cardName + "/" + fileName);
-                    var ocrStr = Optional.of(tesseract.doOCR(file).replace("\n", ""))
-                            .filter(str -> !str.isEmpty())
-                            .orElse(null);
-                    ocrList[i] = ocrStr;
+        var recalculationResults = new ArrayList<RecalculationResult>();
 
-                    if(ocrStr == null){
-                        failMap.put(fileName, i);
-                    }
-                } catch (Exception e) {
-                    ocrList[i] = "error";
-                }
-
-
+        while(i < fileNames.length){
+            var sublist = List.of(fileNames);
+            if((i + 100) > fileNames.length){
+                sublist = sublist.subList(i, fileNames.length);
+            }else{
+                sublist = sublist.subList(i, i + 100);
+            }
+            var recalculationFiles = new ReCalculationFiles(absolutePath, sublist);
+            var subResult = aloaStarFeignClient.recalculateForImage(recalculationFiles);
+            System.out.println(subResult);
+            recalculationResults.addAll(subResult);
+            i += 100;
         }
 
-        if(!failMap.isEmpty()){
-            var absolutePath = Optional.of(new File(imageDir + cardImage))
-                    .map(File::getAbsolutePath)
-                    .orElseThrow(() -> new IllegalArgumentException("directory is not found"));
-            var recalculationFiles = new ReCalculationFiles(absolutePath, failMap.keySet());
-            var recalculationResults = aloaStarFeignClient.recalculateForImage(recalculationFiles);
-
-            recalculationResults.forEach(
-                    result -> ocrList[failMap.get(result.fileName())] = result.cardName()
-            );
-        }
-
-        return List.of(ocrList);
+        return recalculationResults.stream()
+                .sorted(Comparator.comparing(RecalculationResult::fileName))
+                .map(RecalculationResult::cardName)
+                .toList();
     }
 
     private String getFormat(String videoName){

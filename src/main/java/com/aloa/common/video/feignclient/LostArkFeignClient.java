@@ -12,4 +12,7 @@ import java.util.List;
 public interface LostArkFeignClient {
     @GetMapping("/characters/{characterName}/siblings")
     List<CharacterProfile> retrieveAllCharacter(@PathVariable String characterName);
+
+    @GetMapping("/armories/characters/{characterName}/profiles")
+    CharacterProfile retrieveCharacterProfile(@PathVariable String characterName);
 }

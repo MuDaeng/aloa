@@ -22,9 +22,7 @@ public class Expedition {
     /** 사용자 ID 외래키 */
     @Column(nullable = false)
     private Long userId;
-    /** 로아유저 ID 아니면 로아유저 토큰 둘중하나 생각중 */
-    @Column(nullable = false)
-    private String loaAuthToken;
+
     /** 원정대 이름 */
     @Column(nullable = false)
     private String name;
@@ -34,4 +32,8 @@ public class Expedition {
 
     @OneToMany(mappedBy = "expeditionId")
     private List<LostArkCharacter> lostArkCharacterList;
+
+    public void mapLostArkCharacters(List<LostArkCharacter> lostArkCharacters){
+        this.lostArkCharacterList = lostArkCharacters;
+    }
 }

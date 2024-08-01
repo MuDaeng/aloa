@@ -26,6 +26,8 @@ public class GoogleApiManager {
     @Value("${api.key.youtube}")
     private String apiKey;
 
+    private static final String youtubeUrl = "https://www.youtube.com/watch?v=";
+
     private final VideoValidator videoValidator;
 
     public YoutubeInfo getYoutubeInfo(@NonNull String path) {
@@ -36,7 +38,7 @@ public class GoogleApiManager {
         return YoutubeInfo.builder()
                 .title(snippet.getTitle())
                 .description(snippet.getDescription())
-                .path(path)
+                .path(youtubeUrl + youtubeVideoId)
                 .youtubeVideoId(youtubeVideoId)
                 .publishedAt(snippet.getPublishedAt())
                 .channelId(snippet.getChannelId())

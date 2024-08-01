@@ -1,0 +1,4 @@
+endpoint:
+  url:
+    aloa-star: localhost:8000
+    lost-ark: https://developer-lostark.game.onstove.com/

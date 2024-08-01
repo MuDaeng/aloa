@@ -5,7 +5,11 @@ import com.aloa.common.util.VideoFileUtils;
 import com.aloa.common.video.entity.CalculationState;
 import com.aloa.common.video.entity.Video;
 import com.aloa.common.video.entity.VideoMapping;
+import com.aloa.common.video.feignclient.vo.CharacterProfile;
+import com.aloa.common.video.feignclient.vo.RecalculationResult;
 import com.aloa.common.video.handler.*;
+import com.aloa.common.video.feignclient.AloaStarFeignClient;
+import com.aloa.common.video.feignclient.LostArkFeignClient;
 import com.aloa.common.video.manager.VideoSaveManager;
 import com.aloa.online.video.dto.PathDTO;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +42,7 @@ public class GoogleApiController {
     private final Tesseract tesseract;
     private final VideoValidator videoValidator;
     private final AloaStarFeignClient aloaStarFeignClient;
+    private final LostArkFeignClient lostArkFeignClient;
 
     @GetMapping("/youtube")
     public void getUri(@RequestParam String path) {
@@ -60,6 +65,11 @@ public class GoogleApiController {
         video.setCalculationState(CalculationState.WAITING);
 
         return videoSaveManager.regVideo(video, new VideoMapping());
+    }
+
+    @GetMapping("/tttaa")
+    public List<CharacterProfile> ttt(@RequestParam String characterName){
+        return lostArkFeignClient.retrieveAllCharacter(characterName);
     }
 
     @PostMapping("/tnananan")
@@ -157,7 +167,7 @@ public class GoogleApiController {
             Files.createDirectory(directory);
         }catch(IOException ignored){}
 
-        var cardImageIdList = Arrays.asList("5_1Mp9GJK5U");
+        var cardImageIdList = Arrays.asList("-45XjElihhA");
 
         List<File> fileList = new ArrayList<>();
 

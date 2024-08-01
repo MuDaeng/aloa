@@ -86,15 +86,16 @@ public class VideoCalculator {
         }
 
         var cardImageVideoList = List.of(cropVideoTotal.zImage(), cropVideoTotal.xImage());
-        var cardNameVideoList = List.of(cropVideoTotal.zName(), cropVideoTotal.xName());
+//        var cardNameVideoList = List.of(cropVideoTotal.zName(), cropVideoTotal.xName());
 
-        Stream.of(cardImageVideoList, cardNameVideoList)
+//        Stream.of(cardImageVideoList, cardNameVideoList)
+          Stream.of(cardImageVideoList)
             .flatMap(List::stream)
             .forEach(videoFileUtils::extractFrames);
 
-        videoFileUtils.preprocessOcrImage(cardNameVideoList);
+//        videoFileUtils.preprocessOcrImage(cardNameVideoList);
 
-        return videoFileUtils.getOcrImageResult(cardNameVideoList, cardImageVideoList);
+        return videoFileUtils.getOcrImageResult(cardImageVideoList);
     }
 
     private List<CardLifePeriod> getCardLifePeriodList(List<Card> ocrCardList) {
@@ -105,11 +106,27 @@ public class VideoCalculator {
         var currentCard = ocrCardList.getFirst();
         var start = 0;
 
+        var undefiend = List.of(Card.BLACK, Card.UNDEFINED);
         for(var i = 1; i < ocrCardList.size(); i++) {
-            if(!ocrCardList.get(i).equals(currentCard)) {
+            if(!ocrCardList.get(i).equals(currentCard) && !undefiend.contains(ocrCardList.get(i))) {
                 var cardLifePeriod = new CardLifePeriod(currentCard, start, i - 1);
                 start = i;
                 currentCard = ocrCardList.get(i);
+                if(cardLifePeriodList.size() > 1){
+                    var lastCardLifePeriod = cardLifePeriodList.getLast();
+                    var secondLastCardLifePeriod = cardLifePeriodList.get(cardLifePeriodList.size() - 2);
+
+                    var isChangingCard = Card.EMPTY.equals(lastCardLifePeriod.card()) && (lastCardLifePeriod.start() == lastCardLifePeriod.end());
+                    var equalsChangingLastAndCurrent = secondLastCardLifePeriod.card().equals(currentCard);
+
+                    if(isChangingCard && equalsChangingLastAndCurrent){
+                        //merge
+                        cardLifePeriod = new CardLifePeriod(currentCard, secondLastCardLifePeriod.start(), i - 1);
+                        cardLifePeriodList.remove(lastCardLifePeriod);
+                        cardLifePeriodList.remove(secondLastCardLifePeriod);
+                    }
+                }
+
                 cardLifePeriodList.add(cardLifePeriod);
             }
         }
@@ -181,7 +198,7 @@ public class VideoCalculator {
 
     private Map<String, Card> getRecalculatedCardMap() {
         var recalculatedCardMap = new HashMap<String, Card>();
-        recalculatedCardMap.put("black", Card.EMPTY);
+        recalculatedCardMap.put("black", Card.BLACK);
         recalculatedCardMap.put("busik", Card.부식);
         recalculatedCardMap.put("byul", Card.별);
         recalculatedCardMap.put("changing", Card.EMPTY);
@@ -195,7 +212,7 @@ public class VideoCalculator {
         recalculatedCardMap.put("royal", Card.로열);
         recalculatedCardMap.put("samdusa", Card.삼두사);
         recalculatedCardMap.put("simpan", Card.심판);
-        recalculatedCardMap.put("undefined", Card.EMPTY);
+        recalculatedCardMap.put("undefined", Card.UNDEFINED);
         recalculatedCardMap.put("unsu", Card.운수);
         recalculatedCardMap.put("yuryeong", Card.유령);
         recalculatedCardMap.put("zEmpty", Card.EMPTY);
@@ -206,19 +223,21 @@ public class VideoCalculator {
     private Map<String, Card> getOcrCardMap() {
         var cardNameList = new HashMap<Card, List<String>>();
 
-        cardNameList.put(Card.운수, List.of("운명의수레바퀴", "문짱역수래비휘", "문령역수래바퀴", "운명의수레바퀴", "운명의수래바퀴", "0쟁머수래비퀴", "그수재비낌", "운령의수레비퀴", "온령의수레바퀴", "온명이수레바퀴", "운명역수래바퀴", "문명의수래바퀴", "문명여수레바퀴", "운명이수레바퀴", "^수레비쿼", "둔랭의수레바쿼", "운령더수래빠뒤", "운평이수래바랑", "운평릭수레바퀴", "문명의수래바퀴", "운명억수래바퀴", "운명억수래바취"));
+        cardNameList.put(Card.운수, List.of("운명의수레바퀴", "문짱역수래비휘", "문령역수래바퀴", "운명의수레바퀴", "운명의수래바퀴", "0쟁머수래비퀴", "그수재비낌", "운령의수레비퀴", "온령의수레바퀴", "온명이수레바퀴", "운명역수래바퀴", "문명의수래바퀴", "문명여수레바퀴", "운명이수레바퀴", "^수레비쿼", "둔랭의수레바쿼", "운령더수래빠뒤", "운평이수래바랑", "운평릭수레바퀴", "문명의수래바퀴", "운명억수래바퀴", "운명억수래바취", "운명역수레바퀴", "운명의수래바뤄", "운명이수래바뒤", "운령덕수레버취", "운명역수래바튀"));
         cardNameList.put(Card.EMPTY, List.of("ㅅ","^", "ㅅ×","×", "ㅅ%", "ㅅ《", "시종 네기", "때", "|", "1", "<", "1.", "^×", "| '", "", "2", "\\\"4", "1?", "나 /앨", "?"));
-        cardNameList.put(Card.부식, List.of("부식", "루서", "투석", "누이", "시"));
-        cardNameList.put(Card.달, List.of("달", "들", "알", "당", "할", "항", "를", "답", "'들"));
+        cardNameList.put(Card.부식, List.of("부식", "루서", "투석", "누이", "시", "|부식'"));
+        cardNameList.put(Card.달, List.of("달", "들", "알", "당", "할", "항", "를", "답", "'들", "헐", "때벌"));
         cardNameList.put(Card.로열, List.of("로열"));
-        cardNameList.put(Card.심판, List.of("심판", "섬만", "섬딴", "섬반", "심딴", "심판", "백란", "심본", "심떤", "섬반", "설떤", "설편", "설판", "심만", "!심란", "심반", "설레", "심먼", "심딴", "심턴", "샴편", "삼만", "심편"));
-        cardNameList.put(Card.광기, List.of("광기", "깅기", "왕기", "윙기", "황기", "랑기", "굴기", "1 1광기"));
+        cardNameList.put(Card.심판, List.of("심판", "섬만", "섬딴", "섬반", "심딴", "심판", "백란", "심본", "심떤", "섬반", "설떤", "설편", "설판", "심만", "!심란", "심반", "설레", "심먼", "심딴", "심턴", "샴편", "삼만", "심편", "심판0"));
+        cardNameList.put(Card.광기, List.of("광기", "깅기", "왕기", "윙기", "황기", "랑기", "굴기", "1 1광기", "|광기", "|강대"));
         cardNameList.put(Card.도태, List.of("도태", "드태", "도대", "도때", "드대"));
-        cardNameList.put(Card.별, List.of("덩"));
-        cardNameList.put(Card.균형, List.of("균형", "관영", "군영", "균영", "관형"));
-        cardNameList.put(Card.뒤운, List.of("뒤틀린 운명", "뒤출린 은면", "뒤출린 은", "뒤총린 운영", "뒤출린 운영", "뒤올린 운명", "뒤돌린 운명", "뒤들린 운명"));
-        cardNameList.put(Card.유령, List.of("유령", "유행", "유얼", "유혈", "유정", "유햄", "유랭", "유림", "유영", "유랭", "{유형", "유형"));
-        cardNameList.put(Card.삼두사, List.of("삼두사", "두사"));
+        cardNameList.put(Card.별, List.of("별", "덩", "엘'"));
+        cardNameList.put(Card.균형, List.of("균형", "관영", "군영", "균영", "관형", "'균점", "군헤"));
+        cardNameList.put(Card.뒤운, List.of("뒤틀린 운명", "뒤출린 은면", "뒤출린 은", "뒤총린 운영", "뒤출린 운영", "뒤올린 운명", "뒤돌린 운명", "뒤들린 운명", "뒤발린 운명"));
+        cardNameList.put(Card.유령, List.of("유령", "유행", "유얼", "유혈", "유정", "유햄", "유랭", "유림", "유영", "유랭", "{유형", "유형", "1유린"));
+        cardNameList.put(Card.삼두사, List.of("삼두사", "두사", "샴두사", "삼두", "힘두사 |"));
+        cardNameList.put(Card.환희, List.of("환희", "판희"));
+        cardNameList.put(Card.BLACK, List.of("설"));
 
         var ocrCardMap = new HashMap<String, Card>();
 

@@ -21,13 +21,10 @@ public class LostArkCharacter {
     /** 원정대 ID */
     @Id
     @Column(name = "expedition_id", nullable = false)
-    @NotBlank
     private Long expeditionId;
     /** 원정대의 캐릭터 순번 */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @NotBlank
-    private int sequence;
+    private Integer sequence;
     /** 닉네임 */
     @Column(nullable = false)
     private String nickName;
@@ -42,12 +39,4 @@ public class LostArkCharacter {
     private boolean deleted;
 
     private String imageUrl;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Expedition expedition;
-
-    @OneToMany
-    @JoinColumn(name="expeditionId")
-    @JoinColumn(name="characterSequence")
-    private List<VideoMapping> videoMappingList;
 }
