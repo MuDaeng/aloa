@@ -38,4 +38,12 @@ public class VideoFinder {
     public Optional<VideoMapping> findMappingByVideoId(Long videoId){
         return videoMappingRepository.findByVideoId(videoId);
     }
+
+    public List<VideoCalculationResult> findCalculationResultByCharacter(Long expeditionId, Integer characterSequence){
+        var videoIds = videoMappingRepository.findByExpeditionIdAndSequence(expeditionId, characterSequence).stream()
+                .map(VideoMapping::getVideoId)
+                .toList();
+
+        return videoCalculationResultRepository.findAllById(videoIds);
+    }
 }

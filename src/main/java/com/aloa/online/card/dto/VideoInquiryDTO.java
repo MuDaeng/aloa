@@ -1,4 +1,4 @@
-package com.aloa.online.video.dto;
+package com.aloa.online.card.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -13,6 +13,8 @@ import java.util.List;
 public class VideoInquiryDTO {
     private String path;
     private String characterName;
+    private String engrave;
+    private String sideNode;
     private List<CardCntDTO> cardList;
     private List<CardCntDTO> independentTrials;
 }
