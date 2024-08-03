@@ -31,7 +31,7 @@ public class CharacterSaveService {
 
     @Transactional
     public void mapCharacter(@NonNull @Valid CharacterRegisterDTO character) {
-        var user = userRepository.findById(character.getApplicantId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        userRepository.findById(character.getApplicantId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         var characterProfileList = lostArkFeignClient.retrieveAllCharacter(character.getCharacterName());
 

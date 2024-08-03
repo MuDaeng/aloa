@@ -2,8 +2,6 @@ package com.aloa.common.video.handler;
 
 import com.aloa.common.user.repository.GoogleMappingRepository;
 import com.aloa.common.util.SignedInUserUtil;
-import com.aloa.common.video.entity.CalculationState;
-import com.aloa.common.video.entity.Video;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -28,13 +26,6 @@ public class VideoValidator {
         var videoByYoutubeVideoId = videoFinder.findByYoutubeVideoId(youtubeVideoId);
 
         return videoByYoutubeVideoId.isPresent();
-    }
-
-    public CalculationState getCalculationState(Optional<Video> video) {
-        return video.map(Video::getCalculationState)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("등록된 비디오가 없습니다."))
-                ;
     }
 
     public String extractVideoId(String path){
