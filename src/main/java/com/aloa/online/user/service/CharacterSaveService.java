@@ -8,7 +8,7 @@ import com.aloa.common.user.repository.UserRepository;
 import com.aloa.common.util.ChosungExtractor;
 import com.aloa.common.video.feignclient.LostArkFeignClient;
 import com.aloa.common.video.feignclient.vo.CharacterProfile;
-import com.aloa.online.user.dto.CharacterMappingDTO;
+import com.aloa.online.user.dto.CharacterRegisterDTO;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class CharacterSaveService {
     private final LostArkFeignClient lostArkFeignClient;
 
     @Transactional
-    public void mapCharacter(@NonNull @Valid CharacterMappingDTO character) {
+    public void mapCharacter(@NonNull @Valid CharacterRegisterDTO character) {
         var user = userRepository.findById(character.getApplicantId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         var characterProfileList = lostArkFeignClient.retrieveAllCharacter(character.getCharacterName());

@@ -1,6 +1,7 @@
 package com.aloa.common.video.entity;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.card.entity.SideNode;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,12 +36,16 @@ public class Video {
     private Engrave engrave;
 
     @Enumerated(EnumType.ORDINAL)
+    @Setter
+    private SideNode sideNode;
+
+    @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     @Setter
     private CalculationState calculationState;
 
     @Builder
-    public Video(String description, String path, String youtubeVideoId, String chosung, String title, Long id, String clientVersion) {
+    public Video(String description, String path, String youtubeVideoId, String chosung, String title, Long id, String clientVersion, SideNode sideNode) {
         this.description = description;
         this.path = path;
         this.youtubeVideoId = youtubeVideoId;
@@ -48,5 +53,6 @@ public class Video {
         this.title = title;
         this.id = id;
         this.clientVersion = clientVersion;
+        this.sideNode = sideNode;
     }
 }

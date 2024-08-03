@@ -1,6 +1,7 @@
 package com.aloa.online.video.service;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.card.entity.SideNode;
 import com.aloa.common.client.entity.ClientVersion;
 import com.aloa.common.client.manager.ClientVersionManager;
 import com.aloa.common.user.validator.CharacterValidator;
@@ -12,10 +13,13 @@ import com.aloa.common.video.handler.GoogleApiManager;
 import com.aloa.common.video.handler.VideoValidator;
 import com.aloa.common.video.handler.YoutubeInfo;
 import com.aloa.common.video.manager.VideoSaveManager;
+import com.aloa.common.video.repository.VideoMappingRepository;
+import com.aloa.online.video.dto.VideoMappingDTO;
 import com.aloa.online.video.dto.LostArkCharacterIdDTO;
 import com.aloa.online.video.dto.VideoRegisterDTO;
+import com.aloa.online.video.dto.VideoRegisterResultDTO;
 import com.aloa.online.video.event.VideoRegEvent;
-import com.aloa.online.video.mapper.CharacterValidatorMapper;
+import com.aloa.online.video.mapper.VideoSaveMapper;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -37,8 +41,9 @@ public class VideoSaveService {
     private final CharacterValidator characterValidator;
     private final ClientVersionManager clientVersionManager;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final VideoMappingRepository videoMappingRepository;
 
-    public void registVideo(@Valid VideoRegisterDTO videoRegisterDTO){
+    public VideoRegisterResultDTO registerVideo(@Valid VideoRegisterDTO videoRegisterDTO){
         final String path = videoRegisterDTO.getPath();
         final String engrave = videoRegisterDTO.getEngrave();
 
@@ -64,18 +69,30 @@ public class VideoSaveService {
         Map<String, Engrave> engraveMap = new HashMap<>();
         engraveMap.put("EMPRESS", Engrave.EMPRESS);
         engraveMap.put("EMPEROR", Engrave.EMPEROR);
+
         video.setEngrave(engraveMap.get(engrave));
 
         video.setCalculationState(CalculationState.WAITING);
+        video.setSideNode("KNIGHT".equals(videoRegisterDTO.getSideNode()) ? SideNode.황후의기사 : SideNode.NONE);
 
         videoSaveManager.regVideo(video, videoMapping);
 
-        applicationEventPublisher.publishEvent(new VideoRegEvent(video.getId()));
+        var videoRegEvent = new VideoRegEvent(video.getId());
+        applicationEventPublisher.publishEvent(videoRegEvent);
+
+        return VideoSaveMapper.INSTANCE.toVideoRegisterResultDTO(videoRegEvent);
     }
 
+    public void changeCharacter(@NonNull VideoMappingDTO videoMappingDTO) {
+        if(!videoValidator.isVideoOfUser(videoMappingDTO.getVideoId())) throw new IllegalArgumentException("비디오 정보가 정확하지 않습니다.");
 
-    public void mapCharacter(VideoMapping videoMapping, @NonNull @Valid LostArkCharacterIdDTO lostArkCharacterIdDTO){
-        var character = CharacterValidatorMapper.INSTANCE.toLostArkCharacter(lostArkCharacterIdDTO);
+        var videoMapping = videoMappingRepository.findByVideoId(videoMappingDTO.getVideoId())
+                .orElseThrow(() -> new IllegalArgumentException("등록된 비디오가 없습니다."));
+        mapCharacter(videoMapping, videoMappingDTO.getLostArkCharacterIdDTO());
+    }
+
+    private void mapCharacter(VideoMapping videoMapping, @NonNull @Valid LostArkCharacterIdDTO lostArkCharacterIdDTO){
+        var character = VideoSaveMapper.INSTANCE.toLostArkCharacter(lostArkCharacterIdDTO);
         character = characterValidator.findCharacter(character);
 
         if(character == null || !character.isArcana()){

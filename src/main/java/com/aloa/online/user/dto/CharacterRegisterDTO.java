@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CharacterMappingDTO {
+public class CharacterRegisterDTO {
     @NotBlank
     private Long applicantId;
     @NotBlank

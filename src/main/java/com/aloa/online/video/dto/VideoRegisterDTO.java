@@ -1,6 +1,7 @@
 package com.aloa.online.video.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -12,5 +13,6 @@ public class VideoRegisterDTO {
     @NotBlank(message = "경로는 필수")
     private String path;
     private String engrave;
+    private String sideNode;
     private LostArkCharacterIdDTO characterId;
 }

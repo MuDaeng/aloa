@@ -64,6 +64,20 @@ public class VideoValidator {
 
         String googleEmail = signedInUser.getUserId();
 
-        return googleMappingRepository.findByGoogleUserId(googleEmail).filter(googleMapping -> channelId.equals(googleMapping.getChannelId())).isPresent();
+        return googleMappingRepository.findByGoogleUserId(googleEmail)
+                .filter(googleMapping -> channelId.equals(googleMapping.getChannelId()))
+                .isPresent();
+    }
+
+    public boolean isVideoOfUser(@NonNull Long videoId) {
+        var signedInUser = SignedInUserUtil.getSignedInUser();
+
+        if (!signedInUser.isSignedIn()) return false;
+
+        String googleEmail = signedInUser.getUserId();
+
+        return videoFinder.findMappingByVideoId(videoId)
+                .filter(videoMapping -> googleEmail.equals(videoMapping.getGoogleUserId()))
+                .isPresent();
     }
 }

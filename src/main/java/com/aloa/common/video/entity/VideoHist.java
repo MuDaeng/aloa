@@ -1,6 +1,7 @@
 package com.aloa.common.video.entity;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.card.entity.SideNode;
 import com.aloa.common.video.entity.primarykey.VideoHistPK;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -39,6 +40,9 @@ public class VideoHist {
     private Engrave engrave;
 
     @Enumerated(EnumType.ORDINAL)
+    private SideNode sideNode;
+
+    @Enumerated(EnumType.ORDINAL)
     @Column(nullable = false)
     private CalculationState calculationState;
 
@@ -55,6 +59,7 @@ public class VideoHist {
         this.clientVersion = video.getClientVersion();
         this.engrave = video.getEngrave();
         this.calculationState = video.getCalculationState();
+        this.sideNode = video.getSideNode();
         this.regTime = LocalDateTime.now();
     }
 }
