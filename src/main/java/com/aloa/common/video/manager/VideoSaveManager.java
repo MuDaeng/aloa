@@ -41,7 +41,7 @@ public class VideoSaveManager {
         changeCalculationState(video, CalculationState.CALCULATING);
     }
 
-    public void nofityCompleted(@NonNull Video video) {
+    public void notifyCompleted(@NonNull Video video) {
         changeCalculationState(video, CalculationState.COMPLETED);
     }
 

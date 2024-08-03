@@ -65,7 +65,7 @@ public class VideoCalculator {
                 .findFirst()
                 .ifPresent(lastVersionVideo::setEngrave);
 
-        videoSaveManager.nofityCompleted(video);
+        videoSaveManager.notifyCompleted(video);
 
         var reservedVideoList = new ReservedVideoList();
 
