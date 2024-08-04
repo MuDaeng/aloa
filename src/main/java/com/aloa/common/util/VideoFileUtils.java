@@ -42,7 +42,7 @@ public class VideoFileUtils {
     private static final String videoDir = ffmPegPath + "/video/";
     private static final String crop = "_crop_";
     private static final String imagePrefix = "/frame-%05d.png";
-    private static final int fps = 3;
+    private static final int fps = 4;
 
     public void extractFrames(String videoName) {
         log.debug("extract frames from {}", videoName);
@@ -68,12 +68,16 @@ public class VideoFileUtils {
 
     public CropVideoTotal cropVideo(String videoName) throws IOException, InterruptedException {
         log.debug("crop video from {}", videoName);
-//        var cropName = executeFfmpeg(videoName, CropType.NAME);
-        var cropImage = executeFfmpeg(videoName, CropType.IMAGE);
+
+        var cropType = CropType.FHD;
+
+        var videoSize = getVideoSize(videoName);
+
+        if(videoSize.width() == 3440 && videoSize.height() == 1440) cropType = CropType.UHD;
+
+        var cropImage = executeFfmpeg(videoName, cropType);
 
         return CropVideoTotal.builder()
-//                .zName(cropName.z())
-//                .xName(cropName.x())
                 .zImage(cropImage.z())
                 .xImage(cropImage.x())
                 .build();
@@ -158,6 +162,18 @@ public class VideoFileUtils {
         opencv_imgproc.threshold(blurMat, binaryMat, -1, 255, opencv_imgproc.THRESH_OTSU);
 
         opencv_imgcodecs.imwrite(filePath, binaryMat);
+    }
+
+    private VideoSize getVideoSize(String videoName) throws IOException {
+        var format = getFormat(videoName);
+
+        var inputFilePath = videoDir + videoName + format;
+
+        FFmpegProbeResult videoMetaData = ffprobe.probe(inputFilePath);
+
+        var videoSize = videoMetaData.getStreams().getFirst();
+
+        return new VideoSize(videoSize.width, videoSize.height);
     }
 
     public OcrResult getOcrImageResult(List<String> cardImageList){

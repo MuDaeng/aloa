@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum CropType {
-    NAME(15, 15, 1000, ",scale=384:216", ""),
-    IMAGE(15, 8, 993, null, "_card_image");
+    UHD(21, 7, 1015, ",scale=54:54", "_card_image"),
+    FHD(15, 8, 993, null, "_card_image");
 
     private final int widthMultiple;
     private final int heightMultiple;

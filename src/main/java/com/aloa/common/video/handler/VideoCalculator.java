@@ -2,6 +2,7 @@ package com.aloa.common.video.handler;
 
 import com.aloa.common.card.entity.Card;
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.card.entity.SideNode;
 import com.aloa.common.statistics.entity.ReservedVideoList;
 import com.aloa.common.statistics.repository.CalculationReservedVideoRepository;
 import com.aloa.common.util.CropVideoTotal;
@@ -65,7 +66,12 @@ public class VideoCalculator {
                 .findFirst()
                 .ifPresent(lastVersionVideo::setEngrave);
 
-        videoSaveManager.notifyCompleted(video);
+        videoCalculationResultList.stream()
+                .filter(calculationResult -> Card.기사.equals(calculationResult.getCard()))
+                .findFirst()
+                .ifPresent(result -> lastVersionVideo.setSideNode(SideNode.황후의기사));
+
+        videoSaveManager.notifyCompleted(lastVersionVideo);
 
         var reservedVideoList = new ReservedVideoList();
 
@@ -205,6 +211,7 @@ public class VideoCalculator {
         recalculatedCardMap.put("dal", Card.달);
         recalculatedCardMap.put("diun", Card.뒤운);
         recalculatedCardMap.put("dotae", Card.도태);
+        recalculatedCardMap.put("gisa", Card.기사);
         recalculatedCardMap.put("gwangdae", Card.광대);
         recalculatedCardMap.put("gwangki", Card.광기);
         recalculatedCardMap.put("gyunhyun", Card.균형);
