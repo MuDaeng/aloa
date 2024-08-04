@@ -23,6 +23,7 @@ public enum Card {
     황제("황제", Engrave.EMPEROR),
     재상("재상", Engrave.EMPEROR),
     제후("제후", Engrave.EMPEROR),
+    기사("황후의 기사", Engrave.COMMON),
     EMPTY("", Engrave.COMMON),
     BLACK("", Engrave.COMMON),
     UNDEFINED("", Engrave.COMMON),

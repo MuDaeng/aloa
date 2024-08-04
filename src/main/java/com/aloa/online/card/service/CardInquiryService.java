@@ -29,7 +29,10 @@ public class CardInquiryService {
     public VideoInquiryDTO findByVideoId(Long videoId) {
         List<VideoCalculationResult> videoCalculationResultList = videoFinder.findCalculationResultByVideoId(videoId);
         var videoMapping = videoFinder.findMappingByVideoId(videoId);
-        var path = videoFinder.findById(videoId).map(Video::getPath).orElse(null);
+        var video = videoFinder.findById(videoId);
+        var path = video.map(Video::getPath).orElse(null);
+        var engrave = video.map(Video::getEngrave).orElse(null);
+        var sideNode = video.map(Video::getSideNode).orElse(null);
         var characterName = videoMapping
                 .map(mapping -> lostArkCharacterRepository.findByExpeditionIdAndSequence(mapping.getExpeditionId(), mapping.getSequence()))
                 .flatMap(Function.identity())
@@ -43,6 +46,8 @@ public class CardInquiryService {
         return VideoInquiryDTO.builder()
                 .characterName(characterName)
                 .path(path)
+                .sideNode(sideNode != null ? sideNode.name() : null)
+                .engrave(engrave != null ? engrave.name() : null)
                 .independentTrials(CardInquiryMapper.INSTANCE.toCardCntDTOList(independentTrials))
                 .cardList(CardInquiryMapper.INSTANCE.toCardCntDTOList(dependentTrials))
                 .build();
