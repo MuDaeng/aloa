@@ -35,6 +35,11 @@ public class VideoSaveManager {
         changeCalculationState(video, CalculationState.DOWNLOADING);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void notifyFailedDownload(@NonNull Video video) {
+        changeCalculationState(video, CalculationState.FAILED_DOWNLOAD);
+    }
+
     //비디오 계산용
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void notifyCalculating(@NonNull Video video){

@@ -66,11 +66,7 @@ public class VideoSaveService {
         Optional.ofNullable(videoRegisterDTO.getCharacterId())
                 .ifPresent(characterId -> mapCharacter(videoMapping, characterId));
 
-        Map<String, Engrave> engraveMap = new HashMap<>();
-        engraveMap.put("EMPRESS", Engrave.EMPRESS);
-        engraveMap.put("EMPEROR", Engrave.EMPEROR);
-
-        video.setEngrave(engraveMap.get(engrave));
+        video.setEngrave(Engrave.getEngrave(engrave));
 
         video.setCalculationState(CalculationState.WAITING);
         video.setSideNode("KNIGHT".equals(videoRegisterDTO.getSideNode()) ? SideNode.황후의기사 : SideNode.NONE);

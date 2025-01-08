@@ -73,7 +73,7 @@ public class VideoFileUtils {
 
         var videoSize = getVideoSize(videoName);
 
-        if(videoSize.width() == 3440 && videoSize.height() == 1440) cropType = CropType.UHD;
+        if(!(videoSize.width() == 1920 && videoSize.height() == 1080)) cropType = CropType.UHD;
 
         var cropImage = executeFfmpeg(videoName, cropType);
 

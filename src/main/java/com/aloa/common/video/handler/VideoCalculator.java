@@ -51,7 +51,9 @@ public class VideoCalculator {
         //독립시행 종속시행 포함
         var videoCalculationResultList = toVideoCalculationResultList(zCardList, xCardList, independentTrialsCardList, video);
 
-        videoCalculationResultList = videoCalculationResultList.stream().filter(calculationResult -> !calculationResult.getCard().equals(Card.EMPTY)).toList();
+        var unvalidCardList = List.of(Card.EMPTY, Card.UNDEFINED, Card.BLACK);
+
+        videoCalculationResultList = videoCalculationResultList.stream().filter(calculationResult -> !unvalidCardList.contains(calculationResult.getCard())).toList();
 
         log.debug("videoCalculationResultList: {}", videoCalculationResultList);
 
@@ -92,14 +94,10 @@ public class VideoCalculator {
         }
 
         var cardImageVideoList = List.of(cropVideoTotal.zImage(), cropVideoTotal.xImage());
-//        var cardNameVideoList = List.of(cropVideoTotal.zName(), cropVideoTotal.xName());
 
-//        Stream.of(cardImageVideoList, cardNameVideoList)
           Stream.of(cardImageVideoList)
             .flatMap(List::stream)
             .forEach(videoFileUtils::extractFrames);
-
-//        videoFileUtils.preprocessOcrImage(cardNameVideoList);
 
         return videoFileUtils.getOcrImageResult(cardImageVideoList);
     }
@@ -114,27 +112,25 @@ public class VideoCalculator {
 
         var undefiend = List.of(Card.BLACK, Card.UNDEFINED);
         for(var i = 1; i < ocrCardList.size(); i++) {
-            if(!ocrCardList.get(i).equals(currentCard) && !undefiend.contains(ocrCardList.get(i))) {
-                var cardLifePeriod = new CardLifePeriod(currentCard, start, i - 1);
-                start = i;
-                currentCard = ocrCardList.get(i);
-                if(cardLifePeriodList.size() > 1){
-                    var lastCardLifePeriod = cardLifePeriodList.getLast();
-                    var secondLastCardLifePeriod = cardLifePeriodList.get(cardLifePeriodList.size() - 2);
+            if(ocrCardList.get(i).equals(currentCard) || undefiend.contains(ocrCardList.get(i))) continue;
+            var cardLifePeriod = new CardLifePeriod(currentCard, start, i - 1);
+            start = i;
+            currentCard = ocrCardList.get(i);
+            if(cardLifePeriodList.size() > 1){
+                var lastCardLifePeriod = cardLifePeriodList.getLast();
+                var secondLastCardLifePeriod = cardLifePeriodList.get(cardLifePeriodList.size() - 2);
 
-                    var isChangingCard = Card.EMPTY.equals(lastCardLifePeriod.card()) && (lastCardLifePeriod.start() == lastCardLifePeriod.end());
-                    var equalsChangingLastAndCurrent = secondLastCardLifePeriod.card().equals(currentCard);
+                var isChangingCard = Card.EMPTY.equals(lastCardLifePeriod.card()) && (lastCardLifePeriod.start() == lastCardLifePeriod.end());
+                var equalsChangingLastAndCurrent = secondLastCardLifePeriod.card().equals(currentCard);
 
-                    if(isChangingCard && equalsChangingLastAndCurrent){
-                        //merge
-                        cardLifePeriod = new CardLifePeriod(currentCard, secondLastCardLifePeriod.start(), i - 1);
-                        cardLifePeriodList.remove(lastCardLifePeriod);
-                        cardLifePeriodList.remove(secondLastCardLifePeriod);
-                    }
+                if(isChangingCard && equalsChangingLastAndCurrent){
+                    //merge
+                    cardLifePeriod = new CardLifePeriod(currentCard, secondLastCardLifePeriod.start(), i - 1);
+                    cardLifePeriodList.remove(lastCardLifePeriod);
+                    cardLifePeriodList.remove(secondLastCardLifePeriod);
                 }
-
-                cardLifePeriodList.add(cardLifePeriod);
             }
+            cardLifePeriodList.add(cardLifePeriod);
         }
 
         cardLifePeriodList.add(new CardLifePeriod(currentCard, start, ocrCardList.size() - 1));

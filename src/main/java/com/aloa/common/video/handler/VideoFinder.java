@@ -44,6 +44,6 @@ public class VideoFinder {
                 .map(VideoMapping::getVideoId)
                 .toList();
 
-        return videoCalculationResultRepository.findAllById(videoIds);
+        return videoCalculationResultRepository.findByVideoIdIn(videoIds);
     }
 }

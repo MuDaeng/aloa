@@ -18,11 +18,11 @@ public class VideoCalculationResult {
     @Enumerated(EnumType.ORDINAL)
     @Id
     private Card card;
+    @Id
+    private boolean independentTrials;
     /** 카드 갯수 */
     @Column(nullable = false)
     private int cnt;
-    @Id
-    private boolean independentTrials;
 
     @Builder
     public VideoCalculationResult(@Valid Video video, Card card, int cnt, boolean independentTrials) {

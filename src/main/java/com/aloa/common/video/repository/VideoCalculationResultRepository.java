@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface VideoCalculationResultRepository extends JpaRepository<VideoCalculationResult, Long> {
     List<VideoCalculationResult> findByVideoId(@NonNull Long videoId);
+
+    List<VideoCalculationResult> findByVideoIdIn(@NonNull List<Long> videoIds);
 }
