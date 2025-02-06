@@ -1,6 +1,7 @@
 package com.aloa.common.video.entity;
 
 import com.aloa.common.card.entity.Engrave;
+import com.aloa.common.card.entity.PredicateKnight;
 import com.aloa.common.card.entity.SideNode;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Video {
+public class Video implements PredicateKnight {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,5 +55,10 @@ public class Video {
         this.id = id;
         this.clientVersion = clientVersion;
         this.sideNode = sideNode;
+    }
+
+    @Override
+    public boolean isKnight(){
+        return SideNode.KNIGHT.equals(sideNode);
     }
 }

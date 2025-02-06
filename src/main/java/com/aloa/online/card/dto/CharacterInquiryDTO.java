@@ -1,5 +1,6 @@
 package com.aloa.online.card.dto;
 
+import com.aloa.common.card.dto.CardCnt;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,5 +13,5 @@ import java.util.List;
 @Builder
 public class CharacterInquiryDTO {
     private String characterName;
-    private List<CardCntDTO> cardList;
+    private List<CardCnt> cardList;
 }

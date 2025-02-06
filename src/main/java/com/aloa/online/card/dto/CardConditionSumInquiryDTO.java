@@ -11,11 +11,10 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class VideoInquiryDTO {
-    private String path;
-    private String characterName;
+public class CardConditionSumInquiryDTO {
     private String engrave;
     private String sideNode;
-    private List<CardCnt> cardList;
-    private List<CardCnt> independentTrials;
+    private boolean isIndependentTrials;
+    private List<CardCnt> cardCntList;
 }
+

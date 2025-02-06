@@ -10,4 +10,6 @@ public interface VideoMappingRepository extends JpaRepository<VideoMapping, Inte
     Optional<VideoMapping> findByVideoId(Long id);
 
     List<VideoMapping> findByExpeditionIdAndSequence(Long expeditionId, Integer sequence);
+
+    List<VideoMapping> findByGoogleUserId(String googleUserId);
 }

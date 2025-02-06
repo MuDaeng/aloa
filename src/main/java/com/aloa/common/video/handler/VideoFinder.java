@@ -7,12 +7,12 @@ import com.aloa.common.video.repository.VideoCalculationResultRepository;
 import com.aloa.common.video.repository.VideoMappingRepository;
 import com.aloa.common.video.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class VideoFinder {
     private final VideoRepository videoRepository;
@@ -45,5 +45,17 @@ public class VideoFinder {
                 .toList();
 
         return videoCalculationResultRepository.findByVideoIdIn(videoIds);
+    }
+
+    public List<VideoCalculationResult> findCalculationResultByGoogleUserId(String googleUserId){
+        var videoIds = videoMappingRepository.findByGoogleUserId(googleUserId).stream()
+                .map(VideoMapping::getVideoId)
+                .toList();
+
+        return videoCalculationResultRepository.findByVideoIdIn(videoIds);
+    }
+
+    public List<Video> findAllById(Iterable<Long> ids){
+        return videoRepository.findAllById(ids);
     }
 }
