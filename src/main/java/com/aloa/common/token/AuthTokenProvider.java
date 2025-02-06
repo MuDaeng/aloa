@@ -27,14 +27,14 @@ public class AuthTokenProvider {
     private final TokenService tokenService;
 
     public String generateAccessToken(Authentication authentication) {
-        return generateToken(authentication, jwtProperties.getAccessExpirationMinutes());
+        return generateToken(authentication, jwtProperties.getAccessExpirationMinutes(), jwtProperties.getSecretKey());
     }
 
     public String generateRefreshToken(Authentication authentication) {
-        return generateToken(authentication, jwtProperties.getRefreshExpirationMinutes());
+        return generateToken(authentication, jwtProperties.getRefreshExpirationMinutes(), jwtProperties.getRefreshSecretKey());
     }
 
-    private String generateToken(Authentication authentication, long expireTime) {
+    private String generateToken(Authentication authentication, long expireTime, String secretKey) {
 
         var authorities = authentication.getAuthorities()
                 .stream()
@@ -42,7 +42,7 @@ public class AuthTokenProvider {
                 .collect(Collectors.joining());
 
         return Jwts.builder()
-                .signWith(new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), SignatureAlgorithm.HS512.getJcaName()))   // HS512 알고리즘을 사용하여 secretKey를 이용해 서명
+                .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))   // HS512 알고리즘을 사용하여 secretKey를 이용해 서명
                 .setSubject(authentication.getName())  // JWT 토큰 제목
                 .setIssuer(jwtProperties.getIssuer())  // JWT 토큰 발급자
                 .setExpiration(Date.from(Instant.now().plus(expireTime, ChronoUnit.MINUTES)))    // JWT 토큰 만료 시간

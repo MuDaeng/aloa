@@ -53,7 +53,9 @@ public class VideoCalculator {
 
         var unvalidCardList = List.of(Card.EMPTY, Card.UNDEFINED, Card.BLACK);
 
-        videoCalculationResultList = videoCalculationResultList.stream().filter(calculationResult -> !unvalidCardList.contains(calculationResult.getCard())).toList();
+        videoCalculationResultList = videoCalculationResultList.stream()
+                .filter(calculationResult -> !unvalidCardList.contains(calculationResult.getCard()))
+                .toList();
 
         log.debug("videoCalculationResultList: {}", videoCalculationResultList);
 
@@ -71,7 +73,7 @@ public class VideoCalculator {
         videoCalculationResultList.stream()
                 .filter(calculationResult -> Card.기사.equals(calculationResult.getCard()))
                 .findFirst()
-                .ifPresent(result -> lastVersionVideo.setSideNode(SideNode.황후의기사));
+                .ifPresent(result -> lastVersionVideo.setSideNode(SideNode.KNIGHT));
 
         videoSaveManager.notifyCompleted(lastVersionVideo);
 

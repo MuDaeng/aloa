@@ -1,6 +1,8 @@
 package com.aloa.configuration;
 
-import com.aloa.common.security.oauth.*;
+import com.aloa.common.security.oauth.OAuth2FailureHandler;
+import com.aloa.common.security.oauth.OAuth2SuccessHandler;
+import com.aloa.common.security.oauth.OAuth2UserService;
 import com.aloa.common.security.oauth.jwt.JwtAuthFilter;
 import com.aloa.common.security.oauth.jwt.JwtExceptionFilter;
 import com.aloa.common.user.entitiy.primarykey.UserRole;
@@ -12,12 +14,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -34,14 +40,14 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico",
+                .requestMatchers("http://localhost:3000/", "/error", "/favicon.ico",
                         "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**");
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(CsrfConfigurer::disable)
-                .cors(CorsConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .headers(
@@ -53,8 +59,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest
                         .requestMatchers("/video/reg", "/video/character").hasRole(UserRole.USER.getCode())
                         .requestMatchers("/youtube/v1/youtube", "youtube/v1/reg-video").hasRole(UserRole.USER.getCode())
-                        .requestMatchers("/", "/oauth/token", "/api-docs/swagger-config", "/api-docs").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/","/oauth/token", "/api-docs/swagger-config", "/api-docs").permitAll()
+                        .anyRequest().permitAll()
                 )
                 // 로그아웃 성공 시 / 주소로 이동
                 .logout(
@@ -76,5 +82,18 @@ public class SecurityConfig {
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
                 .build();
 //        return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // Vue.js의 주소를 설정
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowCredentials(true);
+
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }

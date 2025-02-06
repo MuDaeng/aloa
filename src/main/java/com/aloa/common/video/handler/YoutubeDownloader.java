@@ -14,7 +14,7 @@ public class YoutubeDownloader {
     private final VideoValidator videoValidator;
     private final VideoSaveManager videoSaveManager;
     private final SyncProcessor syncProcessor;
-    private static final String downloadPath = "/src/main/resources/ffmpeg/bin/video/";
+    private static final String downloadPath = "src/main/resources/ffmpeg/bin/video/";
 
     public void download(Video video){
         videoSaveManager.notifyDownloading(video);

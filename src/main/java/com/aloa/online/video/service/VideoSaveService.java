@@ -27,8 +27,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -61,7 +59,7 @@ public class VideoSaveService {
 
         var videoMapping = VideoMapping.createVideoMapping();
 
-//        if(!videoValidator.isVideoOfUser(youtubeVideo.channelId())) throw new IllegalArgumentException("다른사람의 영상입니다.");
+        if(!videoValidator.isVideoOfUser(youtubeVideo.channelId())) throw new IllegalArgumentException("다른사람의 영상입니다.");
 
         Optional.ofNullable(videoRegisterDTO.getCharacterId())
                 .ifPresent(characterId -> mapCharacter(videoMapping, characterId));
@@ -69,7 +67,7 @@ public class VideoSaveService {
         video.setEngrave(Engrave.getEngrave(engrave));
 
         video.setCalculationState(CalculationState.WAITING);
-        video.setSideNode("KNIGHT".equals(videoRegisterDTO.getSideNode()) ? SideNode.황후의기사 : SideNode.NONE);
+        video.setSideNode(SideNode.KNIGHT.name().equals(videoRegisterDTO.getSideNode()) ? SideNode.KNIGHT : SideNode.NONE);
 
         videoSaveManager.regVideo(video, videoMapping);
 

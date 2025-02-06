@@ -1,8 +1,8 @@
 package com.aloa.common.security.oauth;
 
+import com.aloa.common.token.AuthTokenProvider;
 import com.aloa.common.token.Token;
 import com.aloa.common.token.TokenRepository;
-import com.aloa.common.token.AuthTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -34,11 +33,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         tokenRepository.save(token);
 
         //토큰 전달을 위한 redirect
-        String URI = "/";
-        var redirectUrl = UriComponentsBuilder.fromUriString(URI)
-                .build().toString();
-
-        response.setHeader("Authorization", accessToken);
+        var redirectUrl = "http://localhost:3000/oauth2/callback?accessToken=" + accessToken + "&refreshToken=" + refreshToken;
         response.sendRedirect(redirectUrl);
     }
 }
