@@ -1,1 +1,5 @@
 rootProject.name = 'aloa'
+include 'online'
+include 'daemon'
+include 'common'
+

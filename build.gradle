@@ -5,24 +5,16 @@ plugins {
     id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
-group = 'com'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
-}
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
     }
 }
 
+bootJar.enabled = false
+
 repositories {
     mavenCentral()
-
 }
 
 ext {
@@ -30,70 +22,76 @@ ext {
     set('springCloudVersion', "2023.0.2")
 }
 
-dependencies {
-    //스웨거
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-    implementation 'org.springframework.session:spring-session-core'
-    
-    //롬복
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    //맵스트럭트
-    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.asciidoctor.jvm.convert'
 
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
-    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    group = 'aloa'
+    version = '0.0.1-SNAPSHOT'
 
-    //유튜브
-    implementation 'com.google.api-client:google-api-client:1.33.0'
-    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
-    implementation 'com.google.apis:google-api-services-youtube:v3-rev20230816-2.0.0'
-    implementation 'com.google.http-client:google-http-client-jackson2:1.39.2'
-    implementation 'org.jcodec:jcodec-javase:0.2.5'
-    implementation 'org.jcodec:jcodec:0.2.5'
-
-    //FFMPEG
-    implementation group: 'net.bramp.ffmpeg', name: 'ffmpeg', version: '0.7.0'
-
-    //테서렉트
-    implementation 'net.sourceforge.tess4j:tess4j:5.12.0'
-    //OpenCV 이미지 편집기
-    implementation 'org.bytedeco:javacv-platform:1.5.10'
-
-    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
-    runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
-
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
     }
-}
 
-tasks.named('test') {
-    outputs.dir snippetsDir
-    useJUnitPlatform()
-}
+    dependencies {
+        //스웨거
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+        implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        runtimeOnly 'com.mysql:mysql-connector-j'
+        implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
 
-tasks.named('asciidoctor') {
-    inputs.dir snippetsDir
-    dependsOn test
+        //롬복
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        //맵스트럭트
+        implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+        annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
+
+        annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'io.projectreactor:reactor-test'
+        testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.3'
+        testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        //유튜브
+        implementation 'com.google.api-client:google-api-client:1.33.0'
+        implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
+        implementation 'com.google.apis:google-api-services-youtube:v3-rev20230816-2.0.0'
+        implementation 'com.google.http-client:google-http-client-jackson2:1.39.2'
+        implementation 'org.jcodec:jcodec-javase:0.2.5'
+        implementation 'org.jcodec:jcodec:0.2.5'
+
+        //FFMPEG
+        implementation group: 'net.bramp.ffmpeg', name: 'ffmpeg', version: '0.7.0'
+
+        //테서렉트
+        implementation 'net.sourceforge.tess4j:tess4j:5.12.0'
+        //OpenCV 이미지 편집기
+        implementation 'org.bytedeco:javacv-platform:1.5.10'
+
+        implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+        runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
+
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.0"
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.register("prepareKotlinBuildScriptModel"){}
 }
