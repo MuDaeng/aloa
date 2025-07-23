@@ -1,6 +1,6 @@
 package com.aloa.common.statistics.entity;
 
-import com.aloa.common.statistics.entity.primarykey.CardCalculationStatisticsBatchRunHistPK;
+import com.aloa.common.statistics.entity.primarykey.CardCalculationStatisticsRunHistPK;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -16,14 +16,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@IdClass(CardCalculationStatisticsBatchRunHistPK.class)
+@IdClass(CardCalculationStatisticsRunHistPK.class)
 @Entity
-public class CardCalculationStatisticsBatchRunHist {
+public class CardCalculationStatisticsRunHist {
     @Id
     @Column(nullable = false)
     private LocalDate date;
     @Id
     private int runCount;
-    @Id
+
     private boolean finished;
 }
