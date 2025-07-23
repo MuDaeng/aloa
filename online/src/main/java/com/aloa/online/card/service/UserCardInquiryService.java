@@ -12,12 +12,14 @@ import com.aloa.online.card.dto.CardConditionSumInquiryDTO;
 import com.aloa.online.card.dto.CharacterInquiryDTO;
 import com.aloa.online.card.dto.VideoInquiryDTO;
 import com.aloa.online.card.mapper.UserCardInquiryMapper;
+import com.aloa.online.configuration.security.oauth.SignedInUserFinder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -83,7 +85,8 @@ public class UserCardInquiryService {
     }
 
     @Transactional(readOnly = true)
-    public List<CardConditionSumInquiryDTO> findByUserId(@NonNull Long userId) {
+    public List<CardConditionSumInquiryDTO> findByUserId() {
+        var userId = SignedInUserFinder.getSignedInUser().getUserId();
         var user = userFinder.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -146,6 +149,7 @@ public class UserCardInquiryService {
 
         return card.entrySet().stream()
                 .map(cardEntry -> new CardCnt(cardEntry.getKey(), cardEntry.getValue()))
+                .sorted(Comparator.comparing(CardCnt::cnt).reversed())
                 .toList();
     }
 

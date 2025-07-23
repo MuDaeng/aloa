@@ -30,7 +30,7 @@ public class UserCardInquiryController {
     }
 
     @GetMapping("/v1/user")
-    public List<CardConditionSumInquiryDTO> findByUserId(@RequestParam Long userId) {
-        return userCardInquiryService.findByUserId(userId);
+    public List<CardConditionSumInquiryDTO> findByUserId() {
+        return userCardInquiryService.findByUserId();
     }
 }
