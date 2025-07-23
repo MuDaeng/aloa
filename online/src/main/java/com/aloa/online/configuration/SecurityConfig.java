@@ -40,7 +40,7 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
         return web -> web.ignoring()
                 // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("http://localhost:3000/", "/error", "/favicon.ico",
+                .requestMatchers("http://localhost:3000/**", "/error", "/favicon.ico",
                         "/swagger-ui/**","/swagger-resources/**","/v3/api-docs/**");
     }
     @Bean
@@ -57,7 +57,7 @@ public class SecurityConfig {
                         sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest
-                        .requestMatchers("/video/reg", "/video/character").hasRole(UserRole.USER.getCode())
+                        .requestMatchers("/video/reg", "/video/character", "/card/inquiry/v1/user").hasRole(UserRole.USER.getCode())
                         .requestMatchers("/youtube/v1/youtube", "youtube/v1/reg-video").hasRole(UserRole.USER.getCode())
                         .requestMatchers("/","/oauth/token", "/api-docs/swagger-config", "/api-docs").permitAll()
                         .anyRequest().permitAll()
